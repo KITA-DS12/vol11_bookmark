@@ -17,6 +17,6 @@ services:
       context: .
       dockerfile: ./docker/server/Dockerfile
     ports:
-      - 8888:8080
+      - 8888:8888
     volumes:
       - ./server:/server
