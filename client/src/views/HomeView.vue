@@ -15,7 +15,7 @@
       />
     </label>
   </el-button>
-  <el-button round color="#9A669B" size="large">
+  <el-button round color="#9A669B" size="large" @click="downloadFile">
     <label>
       Download
       <el-icon>
@@ -26,6 +26,8 @@
 </template>
 <script setup lang="ts">
 import axios from "axios";
+
+let received = "";
 const onChangeFile = (e: any) => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -34,10 +36,25 @@ const onChangeFile = (e: any) => {
 
   reader.onload = async () => {
     const fileTxt = reader.result;
-    await axios.post("upload", {
-      content: fileTxt,
-    });
+    await axios
+      .post("upload", {
+        content: fileTxt,
+      })
+      .then((res) => {
+        console.log(res);
+        received = res.data.content;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
+};
+const downloadFile = () => {
+  const blob = new Blob([received], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "donwload.html";
+  link.click();
 };
 </script>
 <style>

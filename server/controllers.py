@@ -25,4 +25,4 @@ class File(BaseModel):
 
 def read_file(file: File):
     print(file.content)
-    return {"content": file.content[:300]}
+    return {"content": file.content}
