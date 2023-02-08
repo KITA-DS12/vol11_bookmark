@@ -1,0 +1,10 @@
+{
+    "name": "client",
+    "dockerComposeFile": [
+        "../docker-compose.yml",
+        "../.devcontainer/docker-compose.yml"
+    ],
+    "service": "client",
+    "workspaceFolder": "/client",
+    "shutdownAction": "none"
+}
