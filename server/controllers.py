@@ -1,6 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import time
+import shutil
+import os
+from bookmarks_converter import BookmarksConverter
 
 
 app = FastAPI()
@@ -13,16 +17,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.post(
+    "/html-json"
+)
+async def upload(bookmark_file: UploadFile(content_type="text/html", filename="html") = File(...)):
+    """bookmarkが保存されたhtmlをjsonに変換する
+    """
+    path = f"/tmp/{str(time.time())}"
+    with open(path, "w+b") as buffer:
+        shutil.copyfileobj(bookmark_file.file, buffer)
 
-def hello():
-    print("Hello, World!")
-    return {"message": "hello world"}
+    bookmarks = BookmarksConverter(path)
+    bookmarks.parse("html")
+    bookmarks.convert("json")
+    os.remove(path)
 
-
-class File(BaseModel):
-    content: str
-
-
-def read_file(file: File):
-    print(file.content)
-    return {"content": file.content}
+    return bookmarks.bookmarks
