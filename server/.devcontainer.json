@@ -1,7 +1,7 @@
 {	"name": "Python 3",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/python:0-3.8-bullseye",
-    "workspaceFolder": "/workspace/server",
+    "workspaceFolder": "/workspaces/vol11_bookmark/server",
 
     "features": {
                   "ghcr.io/devcontainers/features/git:1": {},
