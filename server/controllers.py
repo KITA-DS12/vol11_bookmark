@@ -7,7 +7,8 @@ import shutil
 import os
 from bookmarks_converter import BookmarksConverter
 import json
-
+from category import make_folder_category_list as mf
+from utils import BookMark_Json
 
 app = FastAPI()
 origins = ["http://localhost:8080"]
@@ -36,6 +37,13 @@ async def upload(bookmark_file: UploadFile(content_type="text/html", filename="h
     bookmarks.parse("html")
     bookmarks.convert("json")
     os.remove(path)
+
+    bookmark_json = BookMark_Json(bookmarks.bookmarks)
+    categorize_list = mf(
+        bookmark_json.folder_to_list(),
+        
+    )
+
 
     return bookmarks.bookmarks
 
