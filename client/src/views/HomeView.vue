@@ -8,9 +8,7 @@
             label="File input"
             chips
             @change="getFileContent"
-          />
-        </v-col>
-        <v-col cols=2>
+          /> </v-col> <v-col cols=2>
           <v-btn
             fab
             dark color="indigo"

@@ -14,7 +14,8 @@ const routes = [
   {
     path: '/download',
     name: 'download',
-    component: DownloadView
+    component: DownloadView,
+    props: true
   },
 ]
 

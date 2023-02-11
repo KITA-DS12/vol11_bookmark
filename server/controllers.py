@@ -47,12 +47,13 @@ async def upload(bookmark_file: Post):
     bookmarks.convert("json")
     os.remove(path)
 
-    #bookmark_json = BookMark_Json(bookmarks.bookmarks)
-    # categorize_list = mf(
-    #    bookmark_json.folder_to_list(),
-    #    bookmark_file.folder,
-    # )
-    # print(categorize_list)
+    bookmark_json = BookMark_Json(bookmarks.bookmarks)
+    categorize_list = mf(
+       bookmark_json.folder_to_list(),
+       bookmark_file.folder,
+    )
+    print(bookmark_file.folder)
+    print(categorize_list)
 
     json_open = open('test.json', 'r')
     json_load = json.load(json_open)
