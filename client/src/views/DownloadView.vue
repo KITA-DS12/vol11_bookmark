@@ -36,7 +36,12 @@
       fab
       dark
       large
+      absolute
       color="green"
+      bottom
+      left
+    
+
     >
     <v-icon dark>
         mdi-upload
@@ -48,6 +53,9 @@
       dark
       large
       color="purple"
+      bottom
+      absolute
+    　right
     >
       <v-icon dark>
         mdi-download
