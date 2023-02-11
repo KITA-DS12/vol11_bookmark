@@ -40,8 +40,6 @@
       color="green"
       bottom
       left
-    
-
     >
     <v-icon dark>
         mdi-upload
