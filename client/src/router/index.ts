@@ -1,11 +1,17 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import UploadView from "../views/UploadView.vue";
+import DownloadView from "../views/DownloadView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "home",
-    component: HomeView,
+    name: "upload",
+    component: UploadView,
+  },
+  {
+    path: "/",
+    name: "download",
+    component: DownloadView,
   },
 ];
 
