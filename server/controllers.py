@@ -5,6 +5,7 @@ import time
 import shutil
 import os
 from bookmarks_converter import BookmarksConverter
+from scheme import *
 
 
 app = FastAPI()
@@ -20,7 +21,7 @@ app.add_middleware(
 @app.post(
     "/html-json"
 )
-async def upload(bookmark_file: UploadFile(content_type="text/html", filename="html") = File(...)):
+async def upload(bookmark_file: UploadFile(content_type="text/html", filename="html") = File(...)) -> api_scheme:
     """bookmarkが保存されたhtmlをjsonに変換する
     """
     path = f"/tmp/{str(time.time())}"
