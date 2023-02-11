@@ -85,9 +85,16 @@ class BookMark_Json():
 
             folder_index += 1
 
-        self.bookmark_list = bookmark_list
+        self.bookmark_list = {
+            "type" : "folder",
+            "id" : 0,
+            "index" : 0,
+            "title" : "root",
+            "date_added" : int(time.time()),
+            "children" : bookmark_list
+        }
 
-        return bookmark_list
+        return self.bookmark_list
 
         
 
