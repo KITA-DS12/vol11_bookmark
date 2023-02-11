@@ -6,12 +6,14 @@
           flat
         >
           <v-card-title class="text-center justify-center py-6">
-            <v-img
-              max-height="100"
-              max-width="220"
-              src="@/assets/shiori-org.png"
-              lazy-src="@/assets/lazy-shiori-org.png"
-            />
+            <router-link to="/">
+              <v-img
+                max-height="100"
+                max-width="220"
+                src="@/assets/shiori-org.png"
+                lazy-src="@/assets/lazy-shiori-org.png"
+              />
+            </router-link>
           </v-card-title>
         </v-card>
         <v-main>
