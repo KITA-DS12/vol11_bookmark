@@ -74,23 +74,26 @@ def make_folder_category_list (book_mark_info_list,candidate_labels_list,other_f
     id_txt_category_list = [make_id_txt_category(v) for v in book_mark_info_list]
     return id_txt_category_list
   id_txt_category_list = make_id_txt_category_list(book_mark_info_list)
-  #クラスタリングして候補を取り出す
-  def update_foldername(id_foldername,candidate_labels_list,other_folder_name,category_score):
-    output = id_foldername
-    sequence_to_classify = id_foldername[1]
-    candidate_labels = candidate_labels_list
-    model_value = classifier(sequence_to_classify, candidate_labels, multi_label=False)
-    score_list = model_value['scores']
-    max_score = max(score_list)
-    if category_score > max_score:
-      output[2] = other_folder_name
-    else:
-      max_score_index = score_list.index(max_score )
-      max_score_folder_name = model_value['labels'][max_score_index ]
-      output[2] = max_score_folder_name
-    return output
-  output_id_txt_category_list = [update_foldername(v,candidate_labels_list,other_folder_name,category_score) for v in id_txt_category_list]
-  return output_id_txt_category_list
-
+  # クラスタリングして候補を取り出す
+  def update_foldername(id_foldername, candidate_labels_list, other_folder_name, category_score):
+      output = id_foldername
+      sequence_to_classify = id_foldername[1]
+      if sequence_to_classify == "":
+          output[2] = other_folder_name
+      else:
+          candidate_labels = candidate_labels_list
+          model_value = classifier(sequence_to_classify, candidate_labels, multi_label=False)
+          score_list = model_value['scores']
+          max_score = max(score_list)
+          if category_score > max_score:
+              output[2] = other_folder_name
+          else:
+              max_score_index = score_list.index(max_score)
+              max_score_folder_name = model_value['labels'][max_score_index]
+              output[2] = max_score_folder_name
+      return output
+    output_id_txt_category_list = [update_foldername(v, candidate_labels_list, other_folder_name, category_score) for v in
+                                 id_txt_category_list]
+    return output_id_txt_category_list
 if __name__ == "__main__":
     print(make_folder_category_list (book_mark_info_list,candidate_labels_list,other_folder_name,category_score))
