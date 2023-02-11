@@ -9,6 +9,7 @@ class BookMark_Json():
         """Atribute
                 bookmark: dict #bookmarkのdict"""
         self.bookmark = [bookmark]
+        self.bookmark_list = []
 
     def _folder_parse_url(self, bookmark_folder : list):
         bookmark_list = []
@@ -38,7 +39,59 @@ class BookMark_Json():
             else:
                 bookmark_list.append(i)
 
+        self.bookmark_list = bookmark_list
         return bookmark_list
+
+        
+    def list_to_folder(self, categorise: list, target_folder: str = ""):
+        """Categoriseされたものをもとの形式に戻す
+
+        Args:
+            categorise (list): CategoriseされたList
+            target_folder (str): 格納先フォルダー
+        """
+        #bookmarklistを加工してindexをidにする
+        bookmark_list_dict = {}
+
+        for i in self.bookmark_list:
+            bookmark_list_dict[i["id"]] = i
+
+        #フォルダーのリストを生成する
+        folder_list : dict[list] = {}
+
+        for i in categorise:
+            folder_list[i[2]] = []
+        for i in categorise:
+            folder_list[i[2]].append(i[0])
+
+        #フォルダーを生成する
+        bookmark_list = []
+        folder_index = 0
+        for (i, j) in folder_list.items():
+            bookmark_list.append({
+                "type" : "folder",
+                "id" : folder_index + 1,
+                "index" : folder_index,
+                "title" : i,
+                "children" : []
+            })
+            bookmark_id = 0
+            for k in j:
+                bookmark = bookmark_list_dict[k]
+                bookmark["index"] =  bookmark_id
+                bookmark_id += 1
+                bookmark_list[folder_index]["children"].append(bookmark)
+
+            folder_index += 1
+
+        self.bookmark_list = bookmark_list
+
+        return bookmark_list
+
+        
+
+        
+        
             
             
             

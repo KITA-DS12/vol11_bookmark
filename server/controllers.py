@@ -46,14 +46,17 @@ async def upload(bookmark_file: Post):
 
     bookmark_json = BookMark_Json(bookmarks.bookmarks)
     categorize_list = mf(
-        bookmark_json.folder_to_list(),
-        bookmark_file.folder,
+        book_mark_info_list= bookmark_json.folder_to_list(),
+        candidate_labels_list= bookmark_file.folder,
         
     )
-    print(categorize_list)
+    bookmark = bookmark_json.list_to_folder(
+        categorise=categorize_list
+    )
+    bookmark = json.loads(json.dumps(bookmark))
 
 
-    return bookmarks.bookmarks
+    return bookmark
 
 @app.post(
     "/json-html",
