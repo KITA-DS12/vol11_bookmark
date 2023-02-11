@@ -34,6 +34,26 @@
         </v-btn>
       </v-col>
     </v-row>
+    <v-card
+      color="grey-lighten-4"
+      class="pa-4"
+      v-for="folder in response_children" :key="folder"
+    >
+      {{ folder.title }}
+      <v-list color="blue-grey lighten-5" style="height: 42vh; overflow-y: auto;">
+        <v-list-item-group color="primary">
+         <v-list-item v-for="data in folder.children" :key="data">
+            <v-list-item-icon>
+              <v-icon>mdi-account</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{ data.title }}</v-list-item-title>
+              <v-list-item-title>{{ data.url }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-card>
   </v-app>
 </template>
 
@@ -44,7 +64,9 @@ export default {
     name: 'Home',
     data () {
       return {
-        content: ''
+        content: '',
+        response_json: null,
+        response_children: null
       }
     },
     methods: {
@@ -73,7 +95,11 @@ export default {
             bookmark: this.content.slice(22)
           })
           .then((res) => {
-            console.log(res)
+            this.response_json = res.data
+            this.response_children = this.response_json.children
+            for ( const data in this.response_children) {
+              console.log(this.response_children[data].children)
+            }
           })
           .catch((err) => {
             console.log(err);
