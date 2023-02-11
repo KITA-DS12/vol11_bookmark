@@ -1,5 +1,5 @@
 
-
+import time
 
 
 class BookMark_Json():
@@ -73,6 +73,7 @@ class BookMark_Json():
                 "id" : folder_index + 1,
                 "index" : folder_index,
                 "title" : i,
+                "date_added" : int(time.time()),
                 "children" : []
             })
             bookmark_id = 0
