@@ -32,13 +32,14 @@ const onChangeFile = (e: any) => {
   const file = e.target.files[0];
   const reader = new FileReader();
 
-  reader.readAsText(file);
+  reader.readAsDataURL(file, "utf-8");
 
   reader.onload = async () => {
-    const fileTxt = reader.result;
+    const fileTxt = reader.result.slice(22);
+    console.log(fileTxt)
     await axios
-      .post("upload", {
-        content: fileTxt,
+      .post("html-json", {
+        bookmark: fileTxt,
       })
       .then((res) => {
         console.log(res);
