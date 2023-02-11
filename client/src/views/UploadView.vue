@@ -3,8 +3,10 @@
     <div class="main">
     <div class="input-file">
     <h1>ファイルを入力してください</h1>
-  <v-file-input truncate-length="15"></v-file-input>
+  <v-file-input v-model="file" accept="text/html" truncate-length="15"></v-file-input>
+
   <br/>
+
   <h1>フォルダのリストを入力してください</h1>
   <v-combobox v-model="chips" :items="items" chips clearable label="フォルダのタグを追加" multiple
     prepend-icon="mdi-filter-variant" solo>
@@ -16,24 +18,37 @@
 
     </template>
   </v-combobox>
-  <div class="send-wrapper"><v-btn class="submit">送信</v-btn></div>
-  
+  <v-btn v-on:click="clicked" class="submit">送信</v-btn>
+
   </div>
   </div>
 </v-app>
-  
+
 </template>
 
 <script>
-  import HelloWorld from '../components/HelloWorld'
+export default {
+  data() {
+    return {
+      // 送信するファイル
+      file: "",
+      // この配列をtagとして送信する
+      chips: ['大学', '研究', 'ゲーム', 'その他'],
+      items: ['数学', '競技プログラミング','圏論','論理学','地理','言語学'],
+    }
+  },
 
-  export default {
-    name: 'Home',
-
-    components: {
-      HelloWorld,
+  methods: {
+    remove(item) {
+      this.chips.splice(this.chips.indexOf(item), 1)
     },
-  }
+    // TODO:タグとファイルを送信する
+    clicked(){
+      console.log("送信")
+    },
+  },
+}
+
 </script>
 
 <style scoped>
