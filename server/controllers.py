@@ -21,9 +21,12 @@ app.add_middleware(
 @app.post(
     "/html-json"
 )
-async def upload(bookmark_file: UploadFile(content_type="text/html", filename="html") = File(...)) -> api_scheme:
+async def upload(bookmark_file: UploadFile(content_type="text/html", filename="html") = File(...)):
     """bookmarkが保存されたhtmlをjsonに変換する
+    形式は以下を参照
+    https://github.com/radam9/bookmarks-converter/blob/main/bookmarks_file_structure.md
     """
+
     path = f"/tmp/{str(time.time())}"
     with open(path, "w+b") as buffer:
         shutil.copyfileobj(bookmark_file.file, buffer)
