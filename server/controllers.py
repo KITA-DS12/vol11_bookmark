@@ -1,11 +1,12 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import time
 import shutil
 import os
 from bookmarks_converter import BookmarksConverter
-from scheme import *
+import json
 
 
 app = FastAPI()
@@ -37,3 +38,21 @@ async def upload(bookmark_file: UploadFile(content_type="text/html", filename="h
     os.remove(path)
 
     return bookmarks.bookmarks
+
+@app.post(
+    "/json-html",
+    response_class=FileResponse
+)
+async def json_to_html(item : dict):
+    """jsonをhtmlに変換する"""
+    path = f"/tmp/{str(time.time())}"
+    with open(path, "w+b") as buffer:
+        buffer.write(json.dumps(item).encode("utf-8"))
+    bookmarks = BookmarksConverter(path)
+    bookmarks.parse("json")
+    bookmarks.convert("html")
+    with open(path, "w+b") as buffer:
+        buffer.write(bookmarks.bookmarks.encode("utf-8"))
+    return FileResponse(path)
+
+
