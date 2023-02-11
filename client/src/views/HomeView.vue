@@ -5,16 +5,14 @@
         <v-file-input
           accept=".html"
           label="File input"
-          outlined
-          dense
+          chips
           @change="getFileContent"
         />
       </v-col>
-      <v-col cols=3>
+      <v-col cols=2>
         <v-btn
           fab
-          dark
-          color="indigo"
+          dark color="indigo"
           @click="uploadFile"
         >
         <v-icon dark>
@@ -22,11 +20,24 @@
         </v-icon>
         </v-btn>
       </v-col>
-      <v-col cols=3>
+      <v-col cols=2>
         <v-btn
           fab
           dark
           color="indigo"
+          @click="reloadFile"
+        >
+        <v-icon dark>
+          mdi-reload
+        </v-icon>
+        </v-btn>
+      </v-col>
+      <v-col cols=2>
+        <v-btn
+          fab
+          dark
+          color="indigo"
+          @click="downloadFile"
         >
         <v-icon dark>
           mdi-download
@@ -37,21 +48,24 @@
     <v-card
       color="grey-lighten-4"
       class="pa-4"
-      v-for="folder in response_children" :key="folder"
+      v-for="folder in response_children"
     >
       {{ folder.title }}
-      <v-list color="blue-grey lighten-5" style="height: 42vh; overflow-y: auto;">
-        <v-list-item-group color="primary">
-         <v-list-item v-for="data in folder.children" :key="data">
-            <v-list-item-icon>
-              <v-icon>mdi-account</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>{{ data.title }}</v-list-item-title>
-              <v-list-item-title>{{ data.url }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list-item-group>
+      <v-list color="blue-grey lighten-5" style="height: 30vh; overflow-y: auto;">
+       <v-list-item v-for="data in folder.children">
+          <v-list-item-avatar>
+            <img :src="data.icon">
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <v-text-field
+              v-model="data.title"
+              filled
+              label="title"
+              clearable
+            ></v-text-field>
+            <v-list-item-title><a :href="data.url">{{ data.url }}</a></v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-card>
   </v-app>
@@ -66,6 +80,7 @@ export default {
       return {
         content: '',
         response_json: null,
+        response_bookmarkbar: null,
         response_children: null
       }
     },
@@ -91,19 +106,50 @@ export default {
       async uploadFile() {
         console.log(this.content)
         await axios
-          .post("html-json", {
+          .post("upload", {
             bookmark: this.content.slice(22)
           })
           .then((res) => {
             this.response_json = res.data
-            this.response_children = this.response_json.children
-            for ( const data in this.response_children) {
-              console.log(this.response_children[data].children)
-            }
+            this.response_bookmarkbar = this.response_json.children[0]
+            this.response_children = this.response_bookmarkbar.children[0].children
           })
           .catch((err) => {
             console.log(err);
           });
+      },
+      async reloadFile() {
+        console.log(this.content)
+        await axios
+          .post("reload", {
+            item: this.response_json
+          })
+          .then((res) => {
+            console.log(res)
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      },
+      async downloadFile() {
+        await axios
+          .post("download", {
+            item: this.response_json
+          })
+          .then((res) => {
+            console.log(res.data)
+            this.fileDownload(res.data)
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      },
+      fileDownload(html_text) {
+        const blob = new Blob([html_text], {type: "text/html" })
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "bookmark.html";
+        link.click();
       }
     }
   }

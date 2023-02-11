@@ -22,12 +22,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 class Post(BaseModel):
-    bookmark : str = Field("Html", description="Base64のHTML")
-    folder : List[str] = Field(["Folder"], description="フォルダー")
+    bookmark: str = Field("Html", description="Base64のHTML")
+    folder: List[str] = Field(["大学", "研究", "開発", "音楽"], description="フォルダー")
+
 
 @app.post(
-    "/html-json"
+    "/upload"
 )
 async def upload(bookmark_file: Post):
     """bookmarkが保存されたhtmlをjsonに変換する
@@ -44,31 +47,40 @@ async def upload(bookmark_file: Post):
     bookmarks.convert("json")
     os.remove(path)
 
-    bookmark_json = BookMark_Json(bookmarks.bookmarks)
-    categorize_list = mf(
-        bookmark_json.folder_to_list(),
-        bookmark_file.folder,
-        
-    )
-    print(categorize_list)
+    #bookmark_json = BookMark_Json(bookmarks.bookmarks)
+    # categorize_list = mf(
+    #    bookmark_json.folder_to_list(),
+    #    bookmark_file.folder,
+    # )
+    # print(categorize_list)
 
+    json_open = open('test.json', 'r')
+    json_load = json.load(json_open)
 
-    return bookmarks.bookmarks
+    return json_load
+
 
 @app.post(
-    "/json-html",
+    "/reload"
+)
+async def reload(item: dict):
+    print(item)
+    return item
+
+
+@app.post(
+    "/download",
     response_class=FileResponse
 )
-async def json_to_html(item : dict):
+async def download(item: dict):
     """jsonをhtmlに変換する"""
+
     path = f"/tmp/{str(time.time())}"
     with open(path, "w+b") as buffer:
-        buffer.write(json.dumps(item).encode("utf-8"))
+        buffer.write(json.dumps(item["item"]).encode("utf-8"))
     bookmarks = BookmarksConverter(path)
     bookmarks.parse("json")
     bookmarks.convert("html")
     with open(path, "w+b") as buffer:
         buffer.write(bookmarks.bookmarks.encode("utf-8"))
     return FileResponse(path)
-
-
