@@ -1,50 +1,80 @@
 <template>
   <v-app>
-    <v-row justify="center" style="text-align: center" align-content="center">
+    <v-container class="grey lighten-5">
+      <v-row justify="center" style="text-align: center" align-content="center">
+        <v-col cols=3>
+          <v-file-input
+            accept=".html"
+            label="File input"
+            chips
+            @change="getFileContent"
+          />
+        </v-col>
+        <v-col cols=2>
+          <v-btn
+            fab
+            dark color="indigo"
+            @click="uploadFile"
+          >
+          <v-icon dark>
+            mdi-upload
+          </v-icon>
+          </v-btn>
+        </v-col>
+        <v-col cols=2>
+          <v-btn
+            fab
+            dark
+            color="indigo"
+            @click="reloadFile"
+          >
+          <v-icon dark>
+            mdi-reload
+          </v-icon>
+          </v-btn>
+        </v-col>
+        <v-col cols=2>
+          <v-btn
+            fab
+            dark
+            color="indigo"
+            @click="downloadFile"
+          >
+          <v-icon dark>
+            mdi-download
+          </v-icon>
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-row justify="center" style="text-align: center" align-content="center">
       <v-col cols=3>
-        <v-file-input
-          accept=".html"
-          label="File input"
-          chips
-          @change="getFileContent"
-        />
+        <v-combobox
+            v-model="chips"
+            :items="items"
+            chips
+            clearable
+            label="Your favorite hobbies"
+            multiple
+            solo
+          >
+            <template v-slot:selection="{ attrs, item, select, selected }">
+              <v-chip
+                v-bind="attrs"
+                :input-value="selected"
+                close
+                @click="select"
+                @click:close="removeChips(item)"
+              >
+                <strong>{{ item }}</strong>&nbsp;
+                <span>(interest)</span>
+              </v-chip>
+            </template>
+        </v-combobox>
       </v-col>
-      <v-col cols=2>
-        <v-btn
-          fab
-          dark color="indigo"
-          @click="uploadFile"
-        >
-        <v-icon dark>
-          mdi-upload
-        </v-icon>
-        </v-btn>
+      <v-col cols=6>
       </v-col>
-      <v-col cols=2>
-        <v-btn
-          fab
-          dark
-          color="indigo"
-          @click="reloadFile"
-        >
-        <v-icon dark>
-          mdi-reload
-        </v-icon>
-        </v-btn>
-      </v-col>
-      <v-col cols=2>
-        <v-btn
-          fab
-          dark
-          color="indigo"
-          @click="downloadFile"
-        >
-        <v-icon dark>
-          mdi-download
-        </v-icon>
-        </v-btn>
-      </v-col>
-    </v-row>
+      </v-row>
+    </v-container>
     <v-card
       color="grey-lighten-4"
       class="pa-4"
@@ -81,7 +111,8 @@ export default {
         content: '',
         response_json: null,
         response_bookmarkbar: null,
-        response_children: null
+        response_children: null,
+        chips: []
       }
     },
     methods: {
@@ -150,6 +181,9 @@ export default {
         link.href = URL.createObjectURL(blob);
         link.download = "bookmark.html";
         link.click();
+      },
+      removeChips(item) {
+        this.chips.splice(this.chips.indexOf(item), 1)
       }
     }
   }
