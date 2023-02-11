@@ -73,4 +73,15 @@ async def json_to_html(item : dict):
         buffer.write(bookmarks.bookmarks.encode("utf-8"))
     return FileResponse(path)
 
+@app.post(
+    "/base64"
+)
+async def base6464(file: UploadFile = File(...)):
+    path = f"/tmp/{str(time.time())}"
+    with open(path, "w+b") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read())
+
+
 
