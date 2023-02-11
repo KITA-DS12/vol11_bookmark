@@ -9,7 +9,8 @@ const routes = [
   {
     path: '/',
     name: 'upload',
-    component: UploadView
+    component: UploadView,
+    props: true
   },
   {
     path: '/download',

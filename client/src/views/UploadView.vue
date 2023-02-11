@@ -35,7 +35,6 @@
             >
               <v-combobox
                 v-model="chips"
-                :items="items"
                 chips
                 clearable
                 hide-selected
@@ -58,7 +57,7 @@
                 </template>
               </v-combobox>
               <v-btn style="position: absolute; right: 20%; bottom: 25%;" rounded class="white--text" color="blue lighten-1" x-large @click="uploadFile">
-                SEND
+                EXECUTE
                 <v-icon right>
                   mdi-send
                 </v-icon>
@@ -83,8 +82,7 @@ export default {
     chips: []
   }),
   methods: {
-    inputButton() {
-      this.$refs.input.click();
+    inputButton() { this.$refs.input.click();
     },
     async getFileContent() {
       try {
@@ -106,17 +104,13 @@ export default {
       })
     },
     async uploadFile() {
-      console.log(this.content)
       await axios
         .post("upload", {
           bookmark: this.content.slice(22),
           folder: this.chips
         })
         .then((res) => {
-          this.response_json = res.data
-          this.response_bookmarkbar = this.response_json.children[0]
-          this.response_children = this.response_bookmarkbar.children[0].children
-          console.log(this.response_json)
+          this.$router.push({name:'download', params: {response: res.data}})
         })
         .catch((err) => {
           console.log(err);
