@@ -53,7 +53,6 @@ async def upload(bookmark_file: Post):
     bookmark = bookmark_json.list_to_folder(
         categorise=categorize_list
     )
-    bookmark = json.loads(json.dumps(bookmark))
 
 
     return bookmark
