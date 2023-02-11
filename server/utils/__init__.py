@@ -1,1 +1,1 @@
-from bookmark_json import BookMark_Json
+from .bookmark_json import BookMark_Json

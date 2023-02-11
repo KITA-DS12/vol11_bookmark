@@ -47,8 +47,10 @@ async def upload(bookmark_file: Post):
     bookmark_json = BookMark_Json(bookmarks.bookmarks)
     categorize_list = mf(
         bookmark_json.folder_to_list(),
+        bookmark_file.folder,
         
     )
+    print(categorize_list)
 
 
     return bookmarks.bookmarks
