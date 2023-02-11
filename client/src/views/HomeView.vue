@@ -43,7 +43,6 @@ const onChangeFile = (e: any) => {
       })
       .then((res) => {
         console.log(res);
-        received = res.data.content;
       })
       .catch((err) => {
         console.log(err);
