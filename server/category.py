@@ -1,6 +1,8 @@
 #ライブラリ
 from transformers import pipeline
 classifier = pipeline("zero-shot-classification", model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli")
+from bs4 import BeautifulSoup
+import requests
 
 #入力
 #クラスタリングしたいフォルダの種類一覧
@@ -50,15 +52,66 @@ book_mark_info_list =[
             "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABx0lEQVQ4jZ2TQWtTQRDHfzO7yUsNKSG0heJJ0YKnCvVSkHrV7+BBeu7Vk9+lH8CLN6EXk4Lo1V48lGClFBELGmmSmr73djy8fS8vll4c+LO7s7OzM///LhQmBmrg+uDtZrgIBQQAKyf/YQbiBexFt9t9niSP7ji3umrW7og0UfWL0ZaOzGYjmBxn2c/BdPpJxuNz+vDwFxxnqmaqZs4V8L5AuS6haqmqXcDpO3jCEN4YmEFmkMcxrSCSGqSh8GcGIY52Am91Ce5HJ5EYBRwbG45222HmUHVS+DX2DhASuKu3oAeolGSqCiDs7gqHh8L2thCCxOQSbxFAO9BToClzNQSJokwmsLUFgwHs78P6eklnlQho6c0axUKbTVhZgUYjHpeqCwE8kMWFxYNF9uVlGA5hbw8ODuqJzajqnPENPtfYDxU2N4OtrRVzkVDfC0V8/h2G/g98AR7ESkJF8tFRcYdzkOf15iRW6y/hlD48voCz+BbmELFrvhrG8OMjPBOAV3D7qXM791R73Var00qSJRoNTyifB5Dn+eVsNv19dTX+mmWj93n+4SWciM1LKkmqy7RoImFBqPqPfH39K7t/4A18f74nAH8Bjm35s3ZkOjEAAAAASUVORK5CYII=",
           "icouri" : None,
           "tags" : None
+        },
+        {
+            "type": "url",
+            "id": 10,
+            "index": 0,
+            "title": "",
+            "date_added": 1676090380,
+            "url": "https://www.youtube.com/watch?v=XGmYvJB8mlc",
+            "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABx0lEQVQ4jZ2TQWtTQRDHfzO7yUsNKSG0heJJ0YKnCvVSkHrV7+BBeu7Vk9+lH8CLN6EXk4Lo1V48lGClFBELGmmSmr73djy8fS8vll4c+LO7s7OzM///LhQmBmrg+uDtZrgIBQQAKyf/YQbiBexFt9t9niSP7ji3umrW7og0UfWL0ZaOzGYjmBxn2c/BdPpJxuNz+vDwFxxnqmaqZs4V8L5AuS6haqmqXcDpO3jCEN4YmEFmkMcxrSCSGqSh8GcGIY52Am91Ce5HJ5EYBRwbG45222HmUHVS+DX2DhASuKu3oAeolGSqCiDs7gqHh8L2thCCxOQSbxFAO9BToClzNQSJokwmsLUFgwHs78P6eklnlQho6c0axUKbTVhZgUYjHpeqCwE8kMWFxYNF9uVlGA5hbw8ODuqJzajqnPENPtfYDxU2N4OtrRVzkVDfC0V8/h2G/g98AR7ESkJF8tFRcYdzkOf15iRW6y/hlD48voCz+BbmELFrvhrG8OMjPBOAV3D7qXM791R73Var00qSJRoNTyifB5Dn+eVsNv19dTX+mmWj93n+4SWciM1LKkmqy7RoImFBqPqPfH39K7t/4A18f74nAH8Bjm35s3ZkOjEAAAAASUVORK5CYII=",
+          "icouri" : None,
+          "tags" : None
         }
         ]
 #閾値
 category_score = 0.5
 #その他ファイルの名前
 other_folder_name= 'その他'
+#メタタグ
+tag="description"
 
 #出力
-def make_folder_category_list (book_mark_info_list,candidate_labels_list,other_folder_name = 'その他',category_score = 0.5):
+def scraping_meta(url, tag):
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    descriptions = []
+    for a in soup.select('meta[name="description"]'):
+        descriptions.append(a.get("content"))
+    if len(descriptions) != 0:
+        description = descriptions[0]
+    else:
+        for a in soup.select('meta[property="og:description"]'):
+            descriptions.append(a.get("content"))
+        if len(descriptions) != 0:
+            description = descriptions[0]
+        else:
+            description = ""
+
+    keywords = []
+    for a in soup.select('meta[name="keywords"]'):
+        keywords.append(a.get("content"))
+    if len(keywords) != 0:
+        k_word = keywords[0]
+    else:
+        for a in soup.select('meta[property="og:keywords"]'):
+            keywords.append(a.get("content"))
+        if len(keywords) != 0:
+            k_word = keywords[0]
+        else:
+            k_word = ""
+
+    if tag == "description":
+        response = description
+    if tag == "keyword":
+        response = k_word
+
+    return response
+
+
+def make_folder_category_list (book_mark_info_list,candidate_labels_list,other_folder_name = 'その他',category_score = 0.5,tag = "description"):
   """_summary_
 
   Args:
@@ -75,24 +128,62 @@ def make_folder_category_list (book_mark_info_list,candidate_labels_list,other_f
     return id_txt_category_list
   id_txt_category_list = make_id_txt_category_list(book_mark_info_list)
   # クラスタリングして候補を取り出す
-  def update_foldername(id_foldername, candidate_labels_list, other_folder_name, category_score):
-      output = id_foldername
-      sequence_to_classify = id_foldername[1]
-      if sequence_to_classify == "":
-          output[2] = other_folder_name
+  def update_foldername(id_foldername,candidate_labels_list,other_folder_name,category_score):
+    output = id_foldername
+    sequence_to_classify = id_foldername[1]
+    if sequence_to_classify == "":
+        output[2] = other_folder_name
+    else:
+      candidate_labels = candidate_labels_list
+      model_value = classifier(sequence_to_classify, candidate_labels, multi_label=False)
+      score_list = model_value['scores']
+      max_score = max(score_list)
+      if category_score > max_score:
+        output[2] = other_folder_name
       else:
-          candidate_labels = candidate_labels_list
-          model_value = classifier(sequence_to_classify, candidate_labels, multi_label=False)
-          score_list = model_value['scores']
-          max_score = max(score_list)
-          if category_score > max_score:
-              output[2] = other_folder_name
-          else:
-              max_score_index = score_list.index(max_score)
-              max_score_folder_name = model_value['labels'][max_score_index]
-              output[2] = max_score_folder_name
-      return output
-  output_id_txt_category_list = [update_foldername(v, candidate_labels_list, other_folder_name, category_score) for v in id_txt_category_list]
+        max_score_index = score_list.index(max_score )
+        max_score_folder_name = model_value['labels'][max_score_index ]
+        output[2] = max_score_folder_name
+    return output
+  output_id_txt_category_list = [update_foldername(v,candidate_labels_list,other_folder_name,category_score) for v in id_txt_category_list]
+  #空の時
+  if output_id_txt_category_list==[]:
+    pass
+  else:
+    #その他に分類されたものを取り出す
+    def other_index(category_update_list,other_folder_name):
+      if category_update_list[2]== other_folder_name :
+        return category_update_list
+      else:
+        pass
+    other_list=list(filter(None,[other_index(v,other_folder_name) for v in output_id_txt_category_list]))
+    if other_list == []:
+      pass
+    else:
+      #IDを参照してdctを取ってくる
+      def URL_from_category(id,dct_list):
+        id_dct = list(filter(lambda item : item['id'] == id,book_mark_info_list))
+        if id_dct==[]:
+          id_dct_uni=[]
+        else:
+          id_dct_uni = id_dct[0]
+          url_to_txt = scraping_meta(id_dct_uni['url'], tag)
+        return [id_dct_uni['id'],url_to_txt,'']
+      other_category_list=[URL_from_category(id_lst[0],book_mark_info_list) for id_lst in other_list]
+      output_id_txt_category_list_other = [update_foldername(v,candidate_labels_list,other_folder_name,category_score) for v in  other_category_list]
+      output_id_txt_category_list.sort()
+      output_id_txt_category_list_other.sort()
+      output_id_txt_category_list_last  = list(map(lambda x: x[0], output_id_txt_category_list))
+      for v in  output_id_txt_category_list_other:
+        idx = output_id_txt_category_list_last.index(v[0])
+        output_id_txt_category_list[idx] = v
+      #print(idx, v, output_id_txt_category_list[idx])
   return output_id_txt_category_list
+
+
 if __name__ == "__main__":
-    print(make_folder_category_list (book_mark_info_list,candidate_labels_list,other_folder_name,category_score))
+  result = make_folder_category_list (book_mark_info_list,candidate_labels_list,other_folder_name = 'その他',category_score = 0.5,tag="description")
+  print(result)
+
+
+
