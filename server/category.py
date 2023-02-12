@@ -92,8 +92,7 @@ def make_folder_category_list (book_mark_info_list,candidate_labels_list,other_f
               max_score_folder_name = model_value['labels'][max_score_index]
               output[2] = max_score_folder_name
       return output
-    output_id_txt_category_list = [update_foldername(v, candidate_labels_list, other_folder_name, category_score) for v in
-                                 id_txt_category_list]
-    return output_id_txt_category_list
+  output_id_txt_category_list = [update_foldername(v, candidate_labels_list, other_folder_name, category_score) for v in id_txt_category_list]
+  return output_id_txt_category_list
 if __name__ == "__main__":
     print(make_folder_category_list (book_mark_info_list,candidate_labels_list,other_folder_name,category_score))
