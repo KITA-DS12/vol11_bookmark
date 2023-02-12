@@ -1,11 +1,11 @@
 <template>
   <v-app id="inspire">
-    <v-main class="grey lighten-3">
+    <v-main class="red lighten-4">
       <v-card>
-        <v-card-title class="grey lighten-1 white--text text-h5">
-          BookMark
+        <v-card-title class="teal lighten-1 white--text text-h5">
+          <b>BookMark</b>
           <v-spacer />
-          <v-btn rounded class="white--text" color="blue lighten-1" x-large @click="reloadFile">
+          <v-btn rounded class="black--text" color="grey lighten-3" x-large @click="reloadFile">
             EXECUTE
             <v-icon dark right>
               mdi-reload
@@ -13,7 +13,7 @@
           </v-btn>
         </v-card-title>
         <v-row
-          class="pa-4"
+          class="pa-4 red lighten-5"
           justify="space-between"
         >
           <v-col cols="5">
@@ -25,7 +25,7 @@
               :load-children="fetchFiles"
               :open.sync="open"
               activatable
-              color="warning"
+              color="#CE5D84"
               transition
             >
               <template v-slot:prepend="{ item }">
@@ -55,24 +55,10 @@
               <v-card
                 v-else
                 :key="selected"
-                class="pt-6 mx-auto"
+                class="pt-6 mx-auto class red lighten-5"
                 flat
               >
                 <div v-for="folder in response_children">
-                  <div v-if="folder.id == active[0]">
-                    <v-row justify="center" style="text-align: center" align-content="center">
-                      <v-col cols="12" sm="2">
-                        <v-subheader>title</v-subheader>
-                      </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-text-field
-                          v-model="folder.title"
-                          single-line
-                          width="30px"
-                        ></v-text-field>
-                      </v-col>
-                    </v-row>
-                  </div>
                   <div v-for="data in folder.children">
                     <div v-if="data.id == active[0]">
                       <div v-if="data.type == 'url'">
@@ -108,7 +94,7 @@
           </v-col>
         </v-row>
       </v-card>
-    <v-btn style="position: absolute; right: 10%; bottom: 20%;" rounded class="white--text" color="purple lighten-1" x-large @click="downloadFile">
+    <v-btn style="position: absolute; right: 10%; bottom: 20%;" rounded class="white--text" color="purple lighten-2" x-large @click="downloadFile">
       DOWNLOAD
       <v-icon right>
         mdi-download
