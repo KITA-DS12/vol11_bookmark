@@ -1,9 +1,9 @@
-FROM node:18-alpine as build-stage
+FROM node:18-bullseye as build-stage
 
 WORKDIR /client
 COPY . .
 
-RUN apk update
+RUN apt-get update && apt-get upgrade -y
 ADD ./client/package.json /client
 RUN npm install
 
