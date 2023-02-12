@@ -56,7 +56,7 @@
                   </v-chip>
                 </template>
               </v-combobox>
-              <v-btn style="position: absolute; right: 20%; bottom: 25%;" rounded class="white--text" color="blue lighten-1" x-large @click="uploadFile">
+              <v-btn v-bind:disabled="!isAllowedToPush" style="position: absolute; right: 20%; bottom: 25%;" rounded class="white--text" color="blue lighten-1" x-large @click="uploadFile">
                 EXECUTE
                 <v-icon right>
                   mdi-send
@@ -77,10 +77,17 @@ export default {
   data: () => ({
     content: '',
     response_json: null,
-    response_bookmarkbar: null,
-    response_children: null,
-    chips: []
+    chips: [],
   }),
+  computed: {
+    isAllowedToPush() {
+      if (this.content != '' && this.chips.length != 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
   methods: {
     inputButton() { this.$refs.input.click();
     },
@@ -116,6 +123,9 @@ export default {
           console.log(err);
         });
     },
+    removeChips(item) {
+      this.chips.splice(this.chips.indexOf(item), 1)
+    }
   }
 }
 </script>
