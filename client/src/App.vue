@@ -8,10 +8,10 @@
           <v-card-title class="text-center justify-center py-6">
             <router-link to="/">
               <v-img
-                max-height="100"
-                max-width="220"
-                src="@/assets/shiori-org.png"
-                lazy-src="@/assets/lazy-shiori-org.png"
+                max-height="150"
+                max-width="290"
+                src="@/assets/logo.png"
+                style="margin-top: -10px"
               />
             </router-link>
           </v-card-title>
