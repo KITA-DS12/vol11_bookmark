@@ -5,7 +5,8 @@ COPY . .
 
 RUN apk update && \
   npm install -g npm && \
-  npm install -g @vue/cli
+  npm install -g @vue/cli && \
+  npm install --save @vue/cli-service
 
 ADD ./client/package.json /client
 
