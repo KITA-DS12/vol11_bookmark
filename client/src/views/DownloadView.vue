@@ -126,8 +126,7 @@ export default {
   },
   created : function(){
     this.response_json = this.$route.params.response
-    this.response_children = this.response_json.children[0].children[0].children
-    console.log(this.response_children)
+    this.response_children = this.response_json.children
   },
   methods: {
     async fetchFiles(item) {

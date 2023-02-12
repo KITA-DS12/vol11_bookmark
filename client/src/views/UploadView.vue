@@ -112,11 +112,13 @@ export default {
     },
     async uploadFile() {
       await axios
-        .post("upload", {
+        .post("html-json", {
           bookmark: this.content.slice(22),
           folder: this.chips
         })
         .then((res) => {
+          console.log("response")
+          console.log(res.data)
           this.$router.push({name:'download', params: {response: res.data}})
         })
         .catch((err) => {
