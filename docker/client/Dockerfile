@@ -1,10 +1,9 @@
-FROM --platform=linux/amd64 node:18-bullseye as build-stage
+FROM node:18-alpine
 
 WORKDIR /client
-COPY . .
-
-RUN apt-get update && apt-get upgrade -y
+COPY ./client .
 ADD ./client/package.json /client
+
 RUN npm install
 
-CMD ["npm", "run", "serve"]
+CMD ["node_modules/.bin/vue-cli-servece", "serve" ]
