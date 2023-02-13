@@ -1,4 +1,4 @@
-FROM node:18-bullseye as build-stage
+FROM --platform=linux/amd64 node:18-bullseye as build-stage
 
 WORKDIR /client
 COPY . .
