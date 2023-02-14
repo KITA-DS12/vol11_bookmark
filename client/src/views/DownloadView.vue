@@ -12,22 +12,10 @@
             </v-icon>
           </v-btn>
         </v-card-title>
-        <v-row
-          class="pa-4 red lighten-5"
-          justify="space-between"
-        >
+        <v-row class="pa-4 red lighten-5" justify="space-between">
           <v-col cols="5">
-            <v-treeview
-              :active.sync="active"
-              :items="response_children"
-              item-key="id"
-              item-text="title"
-              :load-children="fetchFiles"
-              :open.sync="open"
-              activatable
-              color="#CE5D84"
-              transition
-            >
+            <v-treeview :active.sync="active" :items="response_children" item-key="id" item-text="title"
+              :load-children="fetchFiles" :open.sync="open" activatable color="#CE5D84" transition>
               <template v-slot:prepend="{ item }">
                 <v-icon v-if="!item.children">
                   mdi-file
@@ -41,23 +29,13 @@
 
           <v-divider vertical></v-divider>
 
-          <v-col
-            class="text-center"
-          >
+          <v-col class="text-center">
             <v-scroll-y-transition mode="out-in">
-              <div
-                v-if="selected == undefined"
-                class="text-h6 grey--text text--lighten-1 font-weight-light"
-                style="align-self: center;"
-              >
+              <div v-if="selected == undefined" class="text-h6 grey--text text--lighten-1 font-weight-light"
+                style="align-self: center;">
                 Select a File
               </div>
-              <v-card
-                v-else
-                :key="selected"
-                class="pt-6 mx-auto class red lighten-5"
-                flat
-              >
+              <v-card v-else :key="selected" class="pt-6 mx-auto class red lighten-5" flat>
                 <div v-for="folder in response_children">
                   <div v-for="data in folder.children">
                     <div v-if="data.id == active[0]">
@@ -70,11 +48,7 @@
                             <v-subheader>title</v-subheader>
                           </v-col>
                           <v-col cols="12" sm="6">
-                            <v-text-field
-                              v-model="data.title"
-                              single-line
-                              width="30px"
-                            ></v-text-field>
+                            <v-text-field v-model="data.title" single-line width="30px"></v-text-field>
                           </v-col>
                         </v-row>
                         <v-row justify="center" style="text-align: center" align-content="center">
@@ -82,7 +56,8 @@
                             <v-subheader>link</v-subheader>
                           </v-col>
                           <v-col cols="12" sm="6">
-                              <div class="textWrap" style="padding-top: 10px;"><a :href="data.url">{{ data.url }}</a></div>
+                            <div class="textWrap" style="padding-top: 10px;"><a :href="data.url">{{ data.url }}</a>
+                            </div>
                           </v-col>
                         </v-row>
                       </div>
@@ -93,13 +68,13 @@
             </v-scroll-y-transition>
           </v-col>
         </v-row>
+        <v-btn rounded style="position: fixed; bottom: 10%; right: 5%;" class="white--text" color="purple lighten-2" x-large @click="downloadFile">
+          DOWNLOAD
+          <v-icon right>
+            mdi-download
+          </v-icon>
+        </v-btn>
       </v-card>
-    <v-btn style="position: absolute; right: 10%; bottom: 20%;" rounded class="white--text" color="purple lighten-2" x-large @click="downloadFile">
-      DOWNLOAD
-      <v-icon right>
-        mdi-download
-      </v-icon>
-    </v-btn>
     </v-main>
   </v-app>
 </template>
@@ -126,7 +101,7 @@ export default {
       return id
     }
   },
-  created : function(){
+  created: function () {
     this.folder = this.$route.params.folder
     this.response_json = this.$route.params.response
     this.response_children = this.response_json.children
@@ -140,40 +115,40 @@ export default {
       return data
     },
     async reloadFile() {
-        console.log(this.content)
-        await axios
-          .post("json-json", {
-            bookmark: this.response_json,
-            folder: this.folder,
-          })
-          .then((res) => {
-            this.response_json = res.data
-            this.response_children = this.response_json.children
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      },
-      async downloadFile() {
-        await axios
-          .post("json-html", {
-            item: this.response_json
-          })
-          .then((res) => {
-            console.log(res.data)
-            this.fileDownload(res.data)
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      },
-      fileDownload(html_text) {
-        const blob = new Blob([html_text], {type: "text/html" })
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "bookmark.html";
-        link.click();
-      },
+      console.log(this.content)
+      await axios
+        .post("json-json", {
+          bookmark: this.response_json,
+          folder: this.folder,
+        })
+        .then((res) => {
+          this.response_json = res.data
+          this.response_children = this.response_json.children
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    async downloadFile() {
+      await axios
+        .post("json-html", {
+          item: this.response_json
+        })
+        .then((res) => {
+          console.log(res.data)
+          this.fileDownload(res.data)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    fileDownload(html_text) {
+      const blob = new Blob([html_text], { type: "text/html" })
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "bookmark.html";
+      link.click();
+    },
   }
 }
 </script>
@@ -188,4 +163,8 @@ svg {
   overflow:hidden;
   text-overflow:ellipsis;
 }
-</style>
+.fixed_btn {
+  position: fixed;
+  bottom: 10%;
+  right: 10%;
+}
