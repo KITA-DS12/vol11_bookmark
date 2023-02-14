@@ -2,14 +2,11 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-from typing import List, Optional
 import time
 import shutil
 import os
 from bookmarks_converter import BookmarksConverter
 import json
-from category import make_folder_category_list as mf
-from utils import BookMark_Json
 import base64
 from api_convert import app as api_convert_router
 
@@ -28,15 +25,14 @@ app.include_router(api_convert_router)
 
 class Post(BaseModel):
     bookmark: str = Field("Html", description="Base64のHTML")
-    folder: List[str] = Field(["Folder"], description="フォルダー")
-    other: str = Field("その他", description="その他のフォルダーの名前")
 
 
 @app.post(
     "/html-json"
 )
-async def upload(bookmark_file: Post):
-    """bookmarkが保存されたhtmlをjsonに変換する
+async def upload(bookmark_file: Post) -> dict:
+    """bookmarkが保存されたhtmlをjsonに変換する。\n
+    AIによる処理はここでは行わない
     形式は以下を参照
     https://github.com/radam9/bookmarks-converter/blob/main/bookmarks_file_structure.md
     """
@@ -50,18 +46,7 @@ async def upload(bookmark_file: Post):
     bookmarks.convert("json")
     os.remove(path)
 
-    bookmark_json = BookMark_Json(bookmarks.bookmarks)
-    categorize_list = mf(
-        book_mark_info_list=bookmark_json.folder_to_list(),
-        candidate_labels_list=bookmark_file.folder,
-        other_folder_name=bookmark_file.other
-
-    )
-    bookmark = bookmark_json.list_to_folder(
-        categorise=categorize_list
-    )
-
-    return bookmark
+    return bookmarks.bookmarks
 
 
 
@@ -88,6 +73,7 @@ async def json_to_html(item: dict):
     "/base64"
 )
 async def base6464(file: UploadFile = File(...)):
+    """ファイルに対してBase64 Encodeを行う"""
     path = f"/tmp/{str(time.time())}"
     with open(path, "w+b") as buffer:
         shutil.copyfileobj(file.file, buffer)
