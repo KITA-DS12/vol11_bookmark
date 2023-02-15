@@ -2,6 +2,8 @@
 import requests
 from bs4 import BeautifulSoup
 from transformers import pipeline
+import asyncio 
+import aiohttp
 classifier = pipeline("zero-shot-classification",
                       model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli")
 
@@ -76,9 +78,11 @@ tag = "description"
 # 出力
 
 
-def scraping_meta(url, tag):
-    r = requests.get(url)
-    soup = BeautifulSoup(r.text, "html.parser")
+async def scraping_meta(url, tag, session):
+
+    async with session.get(url) as response:
+      r = await response.text()
+      soup = BeautifulSoup(r, "html.parser")
 
     descriptions = []
     for a in soup.select('meta[name="description"]'):
@@ -111,10 +115,11 @@ def scraping_meta(url, tag):
     if tag == "keyword":
         response = k_word
 
+
     return response
 
 
-def make_folder_category_list(book_mark_info_list, candidate_labels_list, other_folder_name='その他', category_score=0.5, tag="description"):
+async def make_folder_category_list(book_mark_info_list, candidate_labels_list, other_folder_name='その他', category_score=0.5, tag="description"):
     """_summary_
 
     Args:
@@ -155,8 +160,7 @@ def make_folder_category_list(book_mark_info_list, candidate_labels_list, other_
         return output
 
 
-    output_id_txt_category_list = [update_foldername(
-        v, candidate_labels_list, other_folder_name, category_score) for v in id_txt_category_list]
+    output_id_txt_category_list = [update_foldername(v, candidate_labels_list, other_folder_name, category_score) for v in id_txt_category_list]
     # 空の時
     if output_id_txt_category_list == []:
         pass
@@ -174,18 +178,20 @@ def make_folder_category_list(book_mark_info_list, candidate_labels_list, other_
             pass
         else:
             # IDを参照してdctを取ってくる
-            def URL_from_category(id, dct_list):
+            async def URL_from_category(id, dct_list, session):
                 id_dct = list(
                     filter(lambda item: item['id'] == id, book_mark_info_list))
                 if id_dct == []:
                     id_dct_uni = []
                 else:
                     id_dct_uni = id_dct[0]
-                    url_to_txt = scraping_meta(id_dct_uni['url'], tag)
+                    url_to_txt = await scraping_meta(id_dct_uni['url'], tag, session)
                 return [id_dct_uni['id'], url_to_txt, '']
 
-            other_category_list = [URL_from_category(
-                id_lst[0], book_mark_info_list) for id_lst in other_list]
+            #URL FROM CATEGORY(非同期処理を書くところ)
+            async with aiohttp.ClientSession() as session:
+              other_category_list = await asyncio.gather(*[URL_from_category(id_lst[0], book_mark_info_list, session) for id_lst in other_list])
+            #ここまで
             output_id_txt_category_list_other = [update_foldername(
                 v, candidate_labels_list, other_folder_name, category_score) for v in other_category_list]
             output_id_txt_category_list.sort()
@@ -199,8 +205,10 @@ def make_folder_category_list(book_mark_info_list, candidate_labels_list, other_
 
     return output_id_txt_category_list
 
-
-if __name__ == "__main__":
-    result = make_folder_category_list(
+async def main(): 
+    result = await make_folder_category_list(
         book_mark_info_list, candidate_labels_list, other_folder_name='その他', category_score=0.5, tag="description")
     print(result)
+
+if __name__ == "__main__":
+  asyncio.run(main())
