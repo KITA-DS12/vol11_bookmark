@@ -73,7 +73,8 @@ category_score = 0.5
 # その他ファイルの名前
 other_folder_name = 'その他'
 # メタタグ
-tag = "description"
+#候補 "description", "keyword", "description_and_keyword"
+tag = "description_and_keyword"
 
 ################################################## 出力 ##################################################
 
@@ -118,17 +119,7 @@ def update_foldername(id_foldername, candidate_labels_list, other_folder_name, c
             output[2] = max_score_folder_name
     return output
 
-# IDを参照してdctを取ってくる
-async def URL_from_category(id, dct_list, session):
-    id_dct = list(
-        filter(lambda item: item['id'] == id, book_mark_info_list))
-    if id_dct == []:
-        id_dct_uni = []
-    else:
-        id_dct_uni = id_dct[0]
-        url_to_txt = await scraping_meta(id_dct_uni['url'], tag, session)
-    return [id_dct_uni['id'], url_to_txt, '']
-
+#スクレイピング
 async def scraping_meta(url, tag, session):
 
     try:
@@ -168,12 +159,24 @@ async def scraping_meta(url, tag, session):
         response = description
     if tag == "keyword":
         response = k_word
+    if tag == "description_and_keyword":
+        response = description +' '+ k_word
 
 
     return response
 
+# スクレイピングしたデータを取ってきて['id','txt','category']にする.
+async def URL_from_category(id, dct_list, session,tag):
+    id_dct = list(
+        filter(lambda item: item['id'] == id, dct_list))
+    if len(id_dct) == 0:
+        id_dct_uni = []
+    else:
+        id_dct_uni = id_dct[0]
+        url_to_txt = await scraping_meta(id_dct_uni['url'], tag, session)
+    return [id_dct_uni['id'], url_to_txt, '']
 
-async def make_folder_category_list(book_mark_info_list, candidate_labels_list, other_folder_name='その他', category_score=0.5, tag="description"):
+async def make_folder_category_list(book_mark_info_list, candidate_labels_list, other_folder_name='その他', category_score=0.5, tag="description_and_keyword"):
     """_summary_
 
     Args:
@@ -195,7 +198,7 @@ async def make_folder_category_list(book_mark_info_list, candidate_labels_list, 
 
     #URL FROM CATEGORY(非同期処理を書くところ)
     async with aiohttp.ClientSession() as session:
-        other_category_list = await asyncio.gather(*[URL_from_category(id_lst[0], book_mark_info_list, session) for id_lst in other_list])
+        other_category_list = await asyncio.gather(*[URL_from_category(id_lst[0], book_mark_info_list, session,tag) for id_lst in other_list])
     #ここまで
     
     output_id_txt_category_list_other = [update_foldername(v, candidate_labels_list, other_folder_name, category_score) for v in other_category_list]
@@ -210,8 +213,17 @@ async def make_folder_category_list(book_mark_info_list, candidate_labels_list, 
     return output_id_txt_category_list
 
 async def main(): 
-    result = await make_folder_category_list(book_mark_info_list, candidate_labels_list, other_folder_name='その他', category_score=0.5, tag="description")
+    result = await make_folder_category_list(book_mark_info_list, candidate_labels_list, other_folder_name='その他', category_score=0.5, tag="description_and_keyword")
     print(result)
+    print('\n')
+    test_url = 'https://act.hoyolab.com/ys/app/interactive-map/index.html?lang=ja-jp#/map/2?shown_types=199,403,17,44,45,46,269,429&center=2008.50,-1084.00&zoom=-3.00'
+    tag_list=["description", "keyword", "description_and_keyword"]
+    async with aiohttp.ClientSession() as session:
+        test_scraping_list = await asyncio.gather(*[scraping_meta(test_url, ta, session) for ta in tag_list])
+    print(test_scraping_list[0] + '\n')
+    print(test_scraping_list[1] + '\n')
+    print(test_scraping_list[2] )
+    
 
 if __name__ == "__main__":
   asyncio.run(main())
