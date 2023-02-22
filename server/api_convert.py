@@ -30,11 +30,11 @@ class Not_Found(BaseModel):
 
 jobs : Dict[str, JsonReturn] = {}
 
-def ai_processing(bookmark_file : JsonPost,id : str) -> None:
+async def ai_processing(bookmark_file : JsonPost,id : str) -> None:
     """AIに分類してもらう"""
     logging.info("Start AI Process id:{}".format(id))
     bookmark_json = BookMark_Json(bookmark_file.bookmark)
-    categorize_list = mf(
+    categorize_list = await mf(
         book_mark_info_list=bookmark_json.folder_to_list(),
         candidate_labels_list=bookmark_file.folder,
         other_folder_name=bookmark_file.other
@@ -45,6 +45,7 @@ def ai_processing(bookmark_file : JsonPost,id : str) -> None:
     )
     logging.info("Ended AI Process id:{}".format(id))
     jobs[id] = JsonReturn(bookmark=bookmark, processing=False)
+
 
 @app.post(
     "/json-json",
