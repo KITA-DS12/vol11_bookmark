@@ -81,7 +81,7 @@ async def json_to_json(bookmark_file: JsonPost):
         dict: Bookmark Json
     """
     bookmark_json = BookMark_Json(bookmark_file.bookmark)
-    categorize_list = mf(
+    categorize_list = await mf(
         book_mark_info_list=bookmark_json.folder_to_list(),
         candidate_labels_list=bookmark_file.folder,
         other_folder_name=bookmark_file.other
