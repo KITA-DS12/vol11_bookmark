@@ -85,16 +85,32 @@ class BookMark_Json():
 
             folder_index += 1
 
-        self.bookmark_list = {
-            "type" : "folder",
-            "id" : 0,
-            "index" : 0,
-            "title" : "root",
-            "date_added" : int(time.time()),
-            "children" : bookmark_list
-        }
+        if(target_folder == ""):
 
-        return self.bookmark_list
+            self.bookmark_list = {
+                "type" : "folder",
+                "id" : 0,
+                "index" : 0,
+                "title" : "root",
+                "date_added" : int(time.time()),
+                "children" : bookmark_list
+            }
+
+            return self.bookmark_list
+
+        else:
+            def replace_folder(target):
+                for i in target:
+                    if(i["type"] == "folder"):
+                        if(i["title"] == target_folder):
+                            i["children"] = bookmark_list
+                        else:
+                            replace_folder(i["children"])
+
+            replace_folder(self.bookmark)
+            return self.bookmark[0]
+                
+            
 
         
 
