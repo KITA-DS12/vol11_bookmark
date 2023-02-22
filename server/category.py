@@ -131,9 +131,12 @@ async def URL_from_category(id, dct_list, session):
 
 async def scraping_meta(url, tag, session):
 
-    async with session.get(url) as response:
-      r = await response.text()
-      soup = BeautifulSoup(r, "html.parser")
+    try:
+        async with session.get(url) as response:
+            r = await response.text()
+            soup = BeautifulSoup(r, "html.parser")
+    except Exception:
+        return None
 
     descriptions = []
     for a in soup.select('meta[name="description"]'):
