@@ -11,13 +11,16 @@ class BookMark_Json():
         self.bookmark = [bookmark]
         self.bookmark_list = []
 
-    def _folder_parse_url(self, bookmark_folder : list):
+    def _folder_parse_url(self, bookmark_folder : list, target_folder : str, children : bool, folder_name : str):
         bookmark_list = []
+        if folder_name == target_folder:
+            children = True
+
         for url in bookmark_folder:
-            if(url["type"] == "url"):
+            if(url["type"] == "url" and children == True):
                 bookmark_list.append(url)
             elif(url["type"] == "folder"):
-                bookmark_list +=  self._folder_parse_url(url["children"])
+                bookmark_list +=  self._folder_parse_url(url["children"], target_folder, children, url["title"])
 
         return bookmark_list
     
@@ -28,13 +31,11 @@ class BookMark_Json():
         """
         bookmark_list = []
         for i in self.bookmark:
-            if(folder_name != "" and i["type"] == "folder" and i["title"] == folder_name):
-                folder_append = self._folder_parse_url(i["children"])
+            if(folder_name != "" and i["type"] == "folder"):
+                folder_append = self._folder_parse_url(i["children"], folder_name, False, i["title"])
                 bookmark_list += folder_append
-            elif(folder_name != ""):
-                continue
-            elif(i["type"] == "folder"):
-                folder_append = self._folder_parse_url(i["children"])
+            elif(i["type"] == "folder" and folder_name == ""):
+                folder_append = self._folder_parse_url(i["children"], folder_name, True)
                 bookmark_list += folder_append
             else:
                 bookmark_list.append(i)
@@ -85,16 +86,32 @@ class BookMark_Json():
 
             folder_index += 1
 
-        self.bookmark_list = {
-            "type" : "folder",
-            "id" : 0,
-            "index" : 0,
-            "title" : "root",
-            "date_added" : int(time.time()),
-            "children" : bookmark_list
-        }
+        if(target_folder == ""):
 
-        return self.bookmark_list
+            self.bookmark_list = {
+                "type" : "folder",
+                "id" : 0,
+                "index" : 0,
+                "title" : "root",
+                "date_added" : int(time.time()),
+                "children" : bookmark_list
+            }
+
+            return self.bookmark_list
+
+        else:
+            def replace_folder(target):
+                for i in target:
+                    if(i["type"] == "folder"):
+                        if(i["title"] == target_folder):
+                            i["children"] = bookmark_list
+                        else:
+                            replace_folder(i["children"])
+
+            replace_folder(self.bookmark)
+            return self.bookmark[0]
+                
+            
 
         
 
