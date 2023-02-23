@@ -15,12 +15,11 @@ logging = getLogger("uvicorn").getChild("ai")
 
 
 
-
 class JsonPost(BaseModel):
     bookmark: dict = Field({}, description="BookmarkのDict")
     folder: List[str] = Field(["Folder"], description="フォルダー")
     other: Optional[str] = Field("その他", description="その他のフォルダーの名前")
-    target : Optional[str] = Field("", description="対象のフォルダー(Defalt = root)")
+    target : Optional[List[str]] = Field([""], description="対象のフォルダー(Defalt = root)")
 
 class JsonReturn(BaseModel):
     bookmark: Optional[dict] = Field({}, description="BookmarkのDict")
@@ -30,12 +29,13 @@ class Not_Found(BaseModel):
     detail : str = Field("Not Found", description="Message")
 
 jobs : Dict[str, JsonReturn] = {}
-def sort_by_ai(bookmark_file : JsonPost, target_folder : str) -> dict:
+def sort_by_ai(bookmark_file : JsonPost, target_folder : str = "") -> dict:
+    """AIにSORTしてもらう"""
     logging.info("Start Sort")
     bookmark_json = BookMark_Json(bookmark_file.bookmark)
     loop = asyncio.get_event_loop()
     categorize_list = loop.run_until_complete(mf(
-        book_mark_info_list=bookmark_json.folder_to_list(),
+        book_mark_info_list=bookmark_json.folder_to_list(folder_name=target_folder),
         candidate_labels_list=bookmark_file.folder,
         other_folder_name=bookmark_file.other
 
@@ -48,19 +48,24 @@ def sort_by_ai(bookmark_file : JsonPost, target_folder : str) -> dict:
     return bookmark
 
 def wrap_sort(sort):
+    """sort_by_aiのwrap関数"""
     return sort_by_ai(*sort)
 
 
     
 
-def ai_processing(bookmark_file : JsonPost,id : str,target_folder : str) -> None:
+def ai_processing(bookmark_file : JsonPost,id : str) -> None:
     """AIに分類してもらう"""
     logging.info("Start AI Process id:{}".format(id))
+    bookmark = []
 
-    jobs[id] = JsonReturn(bookmark={}, processing=True)
-    p = Pool(1)
-    args = [(bookmark_file, target_folder)]
-    bookmark = p.map(wrap_sort, args)
+    for target_folder in bookmark_file.target:
+        jobs[id] = JsonReturn(bookmark={}, processing=True)
+        p = Pool(1)
+        args = [(bookmark_file, target_folder)]
+        bookmark = p.map(wrap_sort, args)
+        bookmark_file.bookmark = bookmark[0]
+
 
     logging.info("Ended AI Process id:{}".format(id))
 
@@ -86,8 +91,7 @@ async def json_to_json(background : BackgroundTasks,bookmark_file: JsonPost) -> 
     background.add_task(
         ai_processing,
         bookmark_file,
-        job_id,
-        bookmark_file.target
+        job_id
     )
     jobs[job_id] = JsonReturn(bookmark = None, processing=True)
 
