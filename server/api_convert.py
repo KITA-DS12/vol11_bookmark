@@ -49,7 +49,8 @@ def sort_by_ai(bookmark_file : JsonPost, target_folder : str = "") -> dict:
 
 def wrap_sort(sort):
     """sort_by_aiのwrap関数"""
-    return sort_by_ai(*sort)
+    result = sort_by_ai(*sort)
+    return result
 
 
     
