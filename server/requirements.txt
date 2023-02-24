@@ -10,3 +10,4 @@ torch
 torchvision
 aiohttp
 Beautifulsoup4
+dictknife
