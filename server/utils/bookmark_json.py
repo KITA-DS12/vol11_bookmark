@@ -40,8 +40,18 @@ class BookMark_Json():
             else:
                 bookmark_list.append(i)
 
-        self.bookmark_list = bookmark_list
-        return bookmark_list
+
+        #重複削除
+        duplication = set()
+        self.bookmark_list = []
+        for bookmark in bookmark_list:
+            if(bookmark["url"] in duplication):
+                continue
+            else:
+                self.bookmark_list.append(bookmark)
+                duplication.add(bookmark["url"])
+        
+        return self.bookmark_list
 
         
     def list_to_folder(self, categorise: list, target_folder: str = ""):
