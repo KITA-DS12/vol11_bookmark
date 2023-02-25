@@ -92,6 +92,15 @@
         </v-btn>
       </v-card>
     </v-main>
+    <v-progress-circular
+      v-if="req_id!=null"
+      :size="70"
+      :width="7"
+      color="purple"
+      indeterminate
+      style="position: fixed; bottom: 50%; right: 45%;"
+    >
+    </v-progress-circular>
   </v-app>
 </template>
 
@@ -102,12 +111,13 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export default {
   data: () => ({
-    folder: [],
+    chips: [],
     response_json: null,
     response_children: null,
     active: [],
     open: [],
     files: [],
+    req_id: null,
   }),
   computed: {
     selected() {
@@ -119,9 +129,9 @@ export default {
     }
   },
   created: function () {
-    this.folder = this.$route.params.folder
+    this.chips = this.$route.params.chips
     this.response_json = this.$route.params.response
-    this.response_children = this.response_json.children[0].children[0].children
+    this.response_children = this.response_json.children
   },
   methods: {
     async fetchPreview() {
@@ -148,23 +158,41 @@ export default {
       return data
     },
     async reloadFile() {
-      console.log(this.content)
       await axios
         .post("json-json", {
           bookmark: this.response_json,
-          folder: this.folder,
-          other: this.other,
-          target: this.target,
+          folder: this.chips,
+          other: "その他",
+          target: this.chips,
         })
         .then((res) => {
-          this.response_json = res.data
-          this.response_children = this.response_json.children
+          this.req_id = res.data
+          this.waitForProcessing()
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    async waitForProcessing() {
+      await axios
+        .get(`json-json/${this.req_id}`, {
+        })
+        .then((res) => {
+          if (res.data.processing) {
+            setTimeout(this.waitForProcessing, 3000)
+          }
+          else {
+            this.response_json = res.data.bookmark
+            this.response_children = this.response_json.children
+            this.req_id = null
+          }
         })
         .catch((err) => {
           console.log(err);
         });
     },
     async downloadFile() {
+      console.log(this.response_json)
       await axios
         .post("json-html", {
           item: this.response_json
