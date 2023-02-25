@@ -210,11 +210,11 @@ export default {
         })
         .then((res) => {
           if (res.data.processing) {
-            setTimeout(this.waitForProcessing, 1500)
+            setTimeout(this.waitForProcessing, 3000)
           }
           else {
             console.log(res.data.bookmark)
-            this.$router.push({name:'download', params: {response: res.data.bookmark, folder: this.chips}})
+            this.$router.push({name:'download', params: {response: res.data.bookmark, chips: this.chips}})
           }
         })
         .catch((err) => {
