@@ -2,7 +2,7 @@
   <v-app id="inspire">
     <v-main class="red lighten-4">
       <v-card>
-        <v-card-title class="teal lighten-1 white--text text-h5">
+        <v-card-title class="teal lighten-1 white--text text-h5" style="padding-top: 3px;">
           <b>BookMark</b>
           <v-spacer />
           <v-btn rounded class="black--text" color="grey lighten-3" x-large @click="reloadFile">
@@ -15,7 +15,7 @@
         <v-row class="pa-4 red lighten-5" justify="space-between">
           <v-col cols="5">
             <v-treeview :active.sync="active" :items="response_children" item-key="id" item-text="title"
-              :load-children="fetchFiles" :open.sync="open" activatable color="#CE5D84" transition>
+              :load-children="fetchFiles" :open.sync="open" activatable color="#CE5D84" transition return-object=true>
               <template v-slot:prepend="{ item }">
                 <v-icon v-if="!item.children">
                   mdi-file
@@ -26,7 +26,6 @@
               </template>
             </v-treeview>
           </v-col>
-
           <v-divider vertical></v-divider>
 
           <v-col class="text-center">
@@ -35,34 +34,31 @@
                 style="align-self: center;">
                 Select a File
               </div>
-              <v-card v-else :key="selected" class="pt-6 mx-auto class red lighten-5" flat>
-                <div v-for="folder in response_children">
-                  <div v-for="data in folder.children">
-                    <div v-if="data.id == active[0]">
-                      <div v-if="data.type == 'url'">
-                        <v-avatar size="64">
-                          <img :src="data.icon">
-                        </v-avatar>
-                        <v-row justify="center" style="text-align: center" align-content="center">
-                          <v-col cols="12" sm="2">
-                            <v-subheader>title</v-subheader>
-                          </v-col>
-                          <v-col cols="12" sm="6">
-                            <v-text-field v-model="data.title" single-line width="30px"></v-text-field>
-                          </v-col>
-                        </v-row>
-                        <v-row justify="center" style="text-align: center" align-content="center">
-                          <v-col cols="12" sm="2">
-                            <v-subheader>link</v-subheader>
-                          </v-col>
-                          <v-col cols="12" sm="6">
-                            <div class="textWrap" style="padding-top: 10px;"><a :href="data.url">{{ data.url }}</a>
-                            </div>
-                          </v-col>
-                        </v-row>
+              <v-card v-else :key="selected" style="width: 50vw" class="pt-6 mx-auto class red lighten-5" flat>
+                <div v-if="selected.type=='folder'">
+                  folder
+                </div>
+                <div v-if="selected.type=='url'">
+                  <v-avatar size="64">
+                    <img :src="selected.icon">
+                  </v-avatar>
+                  <v-row justify="center" style="text-align: center" align-content="center">
+                    <v-col cols="12" sm="2">
+                      <v-subheader>title</v-subheader>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-text-field v-model="selected.title" single-line width="30px"></v-text-field>
+                    </v-col>
+                  </v-row>
+                  <v-row justify="center" style="text-align: center" align-content="center">
+                    <v-col cols="12" sm="2">
+                      <v-subheader>link</v-subheader>
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <div class="textWrap" style="padding-top: 10px;"><a :href="selected.url">{{ selected.url }}</a>
                       </div>
-                    </div>
-                  </div>
+                    </v-col>
+                  </v-row>
                 </div>
               </v-card>
             </v-scroll-y-transition>
@@ -96,17 +92,15 @@ export default {
   computed: {
     selected() {
       if (!this.active.length) return undefined
+      console.log(this.active)
       const id = this.active[0]
-      console.log("ok", id)
       return id
     }
   },
   created: function () {
     this.folder = this.$route.params.folder
     this.response_json = this.$route.params.response
-    this.response_children = this.response_json.children
-    console.log(this.response_json)
-    console.log(this.response_json)
+    this.response_children = this.response_json.children[0].children[0].children
   },
   methods: {
     async fetchFiles(item) {
