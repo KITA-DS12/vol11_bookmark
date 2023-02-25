@@ -108,6 +108,7 @@ export default {
     other: "その他",
     folders: [],
     targets: [],
+    req_id: null,
   }),
   computed: {
     isAllowedToPush() {
@@ -165,6 +166,7 @@ export default {
           bookmark: [this.content.slice(22)],
         })
         .then((res) => {
+          this.response_json = res.data
           const children = res.data.children[0].children[0].children
           children.forEach((elem, index) => {
             if (elem.type == "folder") {
@@ -179,14 +181,32 @@ export default {
     },
     async uploadFile() {
       await axios
-        .post("html-json", {
-          bookmark: this.content.slice(22),
-          folder: this.chips
+        .post("json-json", {
+          bookmark: this.response_json,
+          folder: this.chips,
+          other: "その他",
+          target: this.targets,
         })
         .then((res) => {
-          console.log("response")
-          console.log(res.data)
-          this.$router.push({name:'download', params: {response: res.data, folder: this.chips}})
+          this.req_id = res.data
+          this.waitForProcessing()
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    async waitForProcessing() {
+      await axios
+        .get(`json-json/${this.req_id}`, {
+        })
+        .then((res) => {
+          if (res.data.processing) {
+            setTimeout(this.waitForProcessing, 1500)
+          }
+          else {
+            console.log(res.data.bookmark)
+            this.$router.push({name:'download', params: {response: res.data.bookmark, folder: this.chips}})
+          }
         })
         .catch((err) => {
           console.log(err);
