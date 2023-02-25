@@ -59,6 +59,26 @@
                       </div>
                     </v-col>
                   </v-row>
+                  <div style="height: 60px" />
+                  <v-row justify="center" style="text-align: center" align-content="center">
+                    <v-card
+                      class="mx-auto"
+                      max-width="344"
+                      color="#FAFAFA"
+                      flat
+                    >
+                      <v-img
+                        id="previewImg"
+                        src=""
+                        height="200px"
+                        cover
+                      ></v-img>
+                      <v-card-title id="previewTitle" />
+
+                      <v-card-subtitle id="previewDescription" />
+                    </v-card>
+                  </v-row>
+                  <div style="height: 60px" />
                 </div>
               </v-card>
             </v-scroll-y-transition>
@@ -92,6 +112,9 @@ export default {
   computed: {
     selected() {
       if (!this.active.length) return undefined
+      if (this.active[0].type=="url") {
+        this.fetchPreview()
+      }
       return this.active[0]
     }
   },
@@ -101,6 +124,24 @@ export default {
     this.response_children = this.response_json.children[0].children[0].children
   },
   methods: {
+    async fetchPreview() {
+      await fetch('https://api.linkpreview.net', {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+          key: process.env.VUE_APP_API_KEY,
+          q: this.active[0].url
+        })
+      })
+      .then(data => data.json())
+      .then(json => this.createIMG(json))
+    },
+    createIMG(json) {
+      console.log(json)
+      document.querySelector('#previewTitle').textContent = json.title;
+      document.querySelector('#previewImg').src = json.image;
+      document.querySelector('#previewDescription').textContent = json.description;
+    },
     async fetchFiles(item) {
       await pause(1500)
       let data = item.children.push(...this.response_children)
