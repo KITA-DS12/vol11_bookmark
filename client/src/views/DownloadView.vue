@@ -15,7 +15,7 @@
         <v-row class="pa-4 red lighten-5" justify="space-between">
           <v-col cols="5">
             <v-treeview :active.sync="active" :items="response_children" item-key="id" item-text="title"
-              :load-children="fetchFiles" :open.sync="open" activatable color="#CE5D84" transition return-object=true>
+              :load-children="fetchFiles" :open.sync="open" activatable color="#CE5D84" transition :return-object="true">
               <template v-slot:prepend="{ item }">
                 <v-icon v-if="!item.children">
                   mdi-file
@@ -34,7 +34,7 @@
                 style="align-self: center;">
                 Select a File
               </div>
-              <v-card v-else :key="selected" style="width: 50vw" class="pt-6 mx-auto class red lighten-5" flat>
+              <v-card v-else style="width: 50vw" class="pt-6 mx-auto class red lighten-5" flat>
                 <div v-if="selected.type=='folder'">
                   folder
                 </div>
@@ -92,9 +92,7 @@ export default {
   computed: {
     selected() {
       if (!this.active.length) return undefined
-      console.log(this.active)
-      const id = this.active[0]
-      return id
+      return this.active[0]
     }
   },
   created: function () {
