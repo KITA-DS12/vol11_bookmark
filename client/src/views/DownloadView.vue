@@ -120,6 +120,8 @@ export default {
         .post("json-json", {
           bookmark: this.response_json,
           folder: this.folder,
+          other: this.other,
+          target: this.target,
         })
         .then((res) => {
           this.response_json = res.data
