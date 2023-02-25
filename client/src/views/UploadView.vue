@@ -93,6 +93,15 @@
           </v-col>
         </v-row>
       </v-container>
+      <v-progress-circular
+        v-if="req_id!=null"
+        :size="70"
+        :width="7"
+        color="purple"
+        indeterminate
+        style="position: fixed; bottom: 50%; right: 45%;"
+      >
+      </v-progress-circular>
     </v-main>
   </v-app>
 </template>
@@ -112,7 +121,7 @@ export default {
   }),
   computed: {
     isAllowedToPush() {
-      if (this.content != '' && this.chips.length != 0) {
+      if (this.content != '' && this.chips.length != 0 && this.req_id == null) {
         return true;
       } else {
         return false;
