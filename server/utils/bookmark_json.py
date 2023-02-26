@@ -120,6 +120,35 @@ class BookMark_Json():
 
             replace_folder(self.bookmark)
             return self.bookmark[0]
+
+    def _reset_id(self, folder : dict, current = 0):
+        folder["id"] = current
+        current += 1
+        
+        for child in folder["children"]:
+            if(child["type"] == "folder"):
+                current = self._reset_id(child, current)
+
+            else:
+                child["id"] = current
+                current += 1
+
+
+            
+        return current + 1
+            
+
+        
+
+    def sort_id(self):
+        """idをSortする"""
+        try:
+            self._reset_id(folder=self.bookmark[0],current = 0)
+            return self.bookmark[0]
+        except KeyError:
+            self._reset_id(folder=self.bookmark[0]["item"],current = 0)
+            return self.bookmark[0]["item"]
+        
                 
             
 
