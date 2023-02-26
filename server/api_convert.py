@@ -29,13 +29,15 @@ class Not_Found(BaseModel):
     detail : str = Field("Not Found", description="Message")
 
 jobs : Dict[str, JsonReturn] = {}
-def sort_by_ai(bookmark_file : JsonPost, target_folder : str = "") -> dict:
+def sort_by_ai(bookmark_file : JsonPost, target_folder : list) -> dict:
     """AIにSORTしてもらう"""
+    target_folder = set(target_folder)
     logging.info("Start Sort")
     bookmark_json = BookMark_Json(bookmark_file.bookmark)
     loop = asyncio.get_event_loop()
+    book_mark_info_list = bookmark_json.folder_to_list(folder_name=target_folder)
     categorize_list = loop.run_until_complete(mf(
-        book_mark_info_list=bookmark_json.folder_to_list(folder_name=target_folder),
+        book_mark_info_list=book_mark_info_list,
         candidate_labels_list=bookmark_file.folder,
         other_folder_name=bookmark_file.other
 
@@ -60,12 +62,10 @@ def ai_processing(bookmark_file : JsonPost,id : str) -> None:
     logging.info("Start AI Process id:{}".format(id))
     bookmark = []
 
-    for target_folder in bookmark_file.target:
-        jobs[id] = JsonReturn(bookmark={}, processing=True)
-        p = Pool(1)
-        args = [(bookmark_file, target_folder)]
-        bookmark = p.map(wrap_sort, args)
-        bookmark_file.bookmark = bookmark[0]
+    jobs[id] = JsonReturn(bookmark={}, processing=True)
+    args = [(bookmark_file, bookmark_file.target)]
+    p = Pool(1)
+    bookmark = p.map(wrap_sort, args)
 
 
     logging.info("Ended AI Process id:{}".format(id))
