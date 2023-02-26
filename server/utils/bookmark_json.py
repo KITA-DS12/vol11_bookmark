@@ -1,5 +1,6 @@
 
 import time
+import itertools
 
 
 class BookMark_Json():
@@ -11,9 +12,9 @@ class BookMark_Json():
         self.bookmark = [bookmark]
         self.bookmark_list = []
 
-    def _folder_parse_url(self, bookmark_folder : list, target_folder : str, children : bool, folder_name : str):
+    def _folder_parse_url(self, bookmark_folder : list, target_folder : set, children : bool, folder_name : str):
         bookmark_list = []
-        if folder_name == target_folder:
+        if folder_name in target_folder:
             children = True
 
         for url in bookmark_folder:
@@ -24,18 +25,15 @@ class BookMark_Json():
 
         return bookmark_list
     
-    def folder_to_list(self, folder_name : str = ""):
+    def folder_to_list(self, folder_name : set):
         """特定のフォルダーの中のtypeがurlのdictをリストにして返す
         attr
             folder_name : str = None #検索対象のフォルダーを決定する。Noneなら全部
         """
         bookmark_list = []
         for i in self.bookmark:
-            if(folder_name != "" and i["type"] == "folder"):
+            if(i["type"] == "folder"):
                 folder_append = self._folder_parse_url(i["children"], folder_name, False, i["title"])
-                bookmark_list += folder_append
-            elif(i["type"] == "folder" and folder_name == ""):
-                folder_append = self._folder_parse_url(i["children"], folder_name, True)
                 bookmark_list += folder_append
             else:
                 bookmark_list.append(i)
@@ -52,14 +50,25 @@ class BookMark_Json():
                 duplication.add(bookmark["url"])
         
         return self.bookmark_list
+    
+    def _delete_folder(self, bookmark_folder : list, target_folder : set):
+        bookmark_folder = list(itertools.filterfalse(
+            lambda x: (x["title"] in target_folder) and (x["type"] == "folder"), bookmark_folder
+        ))
+        for bookmark in bookmark_folder:
+            if(bookmark["type"] == "folder"):
+                bookmark["children"] = self._delete_folder(bookmark["children"], target_folder)
+
+        return bookmark_folder
 
         
-    def list_to_folder(self, categorise: list, target_folder: str = ""):
+    def list_to_folder(self, categorise: list, target_folder: set):
         """Categoriseされたものをもとの形式に戻す
 
         Args:
             categorise (list): CategoriseされたList
             target_folder (str): 格納先フォルダー
+            folder_name (set):消すフォルダー
         """
         #bookmarklistを加工してindexをidにする
         bookmark_list_dict = {}
@@ -96,30 +105,22 @@ class BookMark_Json():
 
             folder_index += 1
 
-        if(target_folder == ""):
 
-            self.bookmark_list = {
-                "type" : "folder",
-                "id" : 0,
-                "index" : 0,
-                "title" : "root",
-                "date_added" : int(time.time()),
-                "children" : bookmark_list
-            }
+        append_dict = {
+            "type" : "folder",
+            "id" : 0,
+            "index" : 0,
+            "title" : "unpacker",
+            "date_added" : int(time.time()),
+            "children" : bookmark_list
+        }
 
-            return self.bookmark_list
 
-        else:
-            def replace_folder(target):
-                for i in target:
-                    if(i["type"] == "folder"):
-                        if(i["title"] == target_folder):
-                            i["children"] = bookmark_list
-                        else:
-                            replace_folder(i["children"])
 
-            replace_folder(self.bookmark)
-            return self.bookmark[0]
+
+        self.bookmark[0]["children"] =  self._delete_folder(self.bookmark[0]["children"], target_folder)
+        self.bookmark[0]["children"].append(append_dict)
+        return self.bookmark[0]
 
     def _reset_id(self, folder : dict, current = 0):
         folder["id"] = current
