@@ -7,7 +7,7 @@ import aiohttp
 classifier = pipeline("zero-shot-classification",
                       model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli")
 
-# 入力
+#################################### 入力 ####################################
 # クラスタリングしたいフォルダの種類一覧
 candidate_labels_list = ["食べ物", "研究", "開発"]
 # ブックマークの情報
