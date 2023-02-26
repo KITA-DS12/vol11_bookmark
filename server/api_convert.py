@@ -5,6 +5,7 @@ from category import make_folder_category_list as mf
 from utils import BookMark_Json
 import asyncio
 from logging import getLogger
+from multiprocessing import Pool
 import time
 
 
@@ -14,12 +15,11 @@ logging = getLogger("uvicorn").getChild("ai")
 
 
 
-
 class JsonPost(BaseModel):
     bookmark: dict = Field({}, description="BookmarkのDict")
     folder: List[str] = Field(["Folder"], description="フォルダー")
     other: Optional[str] = Field("その他", description="その他のフォルダーの名前")
-    target : Optional[str] = Field("", description="対象のフォルダー(Defalt = root)")
+    target : Optional[List[str]] = Field([""], description="対象のフォルダー(Defalt = root)")
 
 class JsonReturn(BaseModel):
     bookmark: Optional[dict] = Field({}, description="BookmarkのDict")
@@ -29,22 +29,50 @@ class Not_Found(BaseModel):
     detail : str = Field("Not Found", description="Message")
 
 jobs : Dict[str, JsonReturn] = {}
-
-async def ai_processing(bookmark_file : JsonPost,id : str) -> None:
-    """AIに分類してもらう"""
-    logging.info("Start AI Process id:{}".format(id))
+def sort_by_ai(bookmark_file : JsonPost, target_folder : str = "") -> dict:
+    """AIにSORTしてもらう"""
+    logging.info("Start Sort")
     bookmark_json = BookMark_Json(bookmark_file.bookmark)
-    categorize_list = await mf(
-        book_mark_info_list=bookmark_json.folder_to_list(),
+    loop = asyncio.get_event_loop()
+    categorize_list = loop.run_until_complete(mf(
+        book_mark_info_list=bookmark_json.folder_to_list(folder_name=target_folder),
         candidate_labels_list=bookmark_file.folder,
         other_folder_name=bookmark_file.other
 
-    )
+    ))
     bookmark = bookmark_json.list_to_folder(
-        categorise=categorize_list
+        categorise=categorize_list,
+        target_folder=target_folder
     )
+    logging.info("End Sort")
+    return bookmark
+
+def wrap_sort(sort):
+    """sort_by_aiのwrap関数"""
+    result = sort_by_ai(*sort)
+    return result
+
+
+    
+
+def ai_processing(bookmark_file : JsonPost,id : str) -> None:
+    """AIに分類してもらう"""
+    logging.info("Start AI Process id:{}".format(id))
+    bookmark = []
+
+    for target_folder in bookmark_file.target:
+        jobs[id] = JsonReturn(bookmark={}, processing=True)
+        p = Pool(1)
+        args = [(bookmark_file, target_folder)]
+        bookmark = p.map(wrap_sort, args)
+        bookmark_file.bookmark = bookmark[0]
+
+
     logging.info("Ended AI Process id:{}".format(id))
-    jobs[id] = JsonReturn(bookmark=bookmark, processing=False)
+
+    jobs[id] = JsonReturn(bookmark=bookmark[0], processing=False)
+
+
 
 
 @app.post(
