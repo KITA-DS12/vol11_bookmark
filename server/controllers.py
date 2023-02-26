@@ -11,6 +11,7 @@ import base64
 from typing import List
 from dictknife import deepmerge
 from api_convert import app as api_convert_router
+from utils import BookMark_Json
 
 
 app = FastAPI()
@@ -68,6 +69,8 @@ def delete_file(path: str) -> None:
 )
 async def json_to_html(item: dict, background : BackgroundTasks):
     """jsonをhtmlに変換する"""
+    bookmark = BookMark_Json(item)
+    item = bookmark.sort_id()
     path = f"/tmp/{str(time.time())}"
     with open(path, "w+b") as buffer:
         buffer.write(json.dumps(item).encode("utf-8"))
