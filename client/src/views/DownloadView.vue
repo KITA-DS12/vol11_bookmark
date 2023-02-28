@@ -14,8 +14,9 @@
         </v-card-title>
         <v-row class="pa-4 red lighten-5" justify="space-between">
           <v-col cols="5">
-            <v-treeview :active.sync="active" :items="response_children" item-key="id" item-text="title"
-              :load-children="fetchFiles" :open.sync="open" activatable color="#CE5D84" transition :return-object="true">
+            <v-treeview :active.sync="active" :items="unpacker_json" item-key="id" item-text="title"
+              :load-children="fetchFiles" :open.sync="open" activatable color="#CE5D84" transition
+              :return-object="true">
               <template v-slot:prepend="{ item }">
                 <v-icon v-if="!item.children">
                   mdi-file
@@ -35,10 +36,10 @@
                 Select a File
               </div>
               <v-card v-else style="width: 50vw" class="pt-6 mx-auto class red lighten-5" flat>
-                <div v-if="selected.type=='folder'">
+                <div v-if="selected.type == 'folder'">
                   folder
                 </div>
-                <div v-if="selected.type=='url'">
+                <div v-if="selected.type == 'url'">
                   <v-avatar size="64">
                     <img :src="selected.icon">
                   </v-avatar>
@@ -61,18 +62,8 @@
                   </v-row>
                   <div style="height: 60px" />
                   <v-row justify="center" style="text-align: center" align-content="center">
-                    <v-card
-                      class="mx-auto"
-                      max-width="344"
-                      color="#FAFAFA"
-                      flat
-                    >
-                      <v-img
-                        id="previewImg"
-                        src=""
-                        height="200px"
-                        cover
-                      ></v-img>
+                    <v-card class="mx-auto" max-width="344" color="#FAFAFA" flat>
+                      <v-img id="previewImg" src="" height="200px" cover></v-img>
                       <v-card-title id="previewTitle" />
 
                       <v-card-subtitle id="previewDescription" />
@@ -84,7 +75,8 @@
             </v-scroll-y-transition>
           </v-col>
         </v-row>
-        <v-btn rounded style="position: fixed; bottom: 10%; right: 5%;" class="white--text" color="purple lighten-2" x-large @click="downloadFile">
+        <v-btn rounded style="position: fixed; bottom: 10%; right: 5%;" class="white--text" color="purple lighten-2"
+          x-large @click="downloadFile">
           DOWNLOAD
           <v-icon right>
             mdi-download
@@ -92,14 +84,8 @@
         </v-btn>
       </v-card>
     </v-main>
-    <v-progress-circular
-      v-if="req_id!=null"
-      :size="70"
-      :width="7"
-      color="purple"
-      indeterminate
-      style="position: fixed; bottom: 50%; right: 45%;"
-    >
+    <v-progress-circular v-if="req_id != null" :size="70" :width="7" color="purple" indeterminate
+      style="position: fixed; bottom: 50%; right: 45%;">
     </v-progress-circular>
   </v-app>
 </template>
@@ -114,6 +100,7 @@ export default {
     chips: [],
     response_json: null,
     response_children: null,
+    unpacker_json: null,
     active: [],
     open: [],
     files: [],
@@ -122,7 +109,7 @@ export default {
   computed: {
     selected() {
       if (!this.active.length) return undefined
-      if (this.active[0].type=="url") {
+      if (this.active[0].type == "url") {
         this.fetchPreview()
       }
       return this.active[0]
@@ -132,6 +119,14 @@ export default {
     this.chips = this.$route.params.chips
     this.response_json = this.$route.params.response
     this.response_children = this.response_json.children
+    this.response_children.forEach(element => {
+      console.log(element)
+      if (element.title == "unpacker") {
+        this.unpacker_json = element.children
+      } else {
+        console.log("else")
+      }
+    })
   },
   methods: {
     async fetchPreview() {
@@ -143,8 +138,8 @@ export default {
           q: this.active[0].url
         })
       })
-      .then(data => data.json())
-      .then(json => this.createIMG(json))
+        .then(data => data.json())
+        .then(json => this.createIMG(json))
     },
     createIMG(json) {
       console.log(json)
@@ -192,7 +187,14 @@ export default {
         });
     },
     async downloadFile() {
-      console.log(this.response_json)
+      console.log(this.response_children)
+      this.response_children.forEach(element => {
+        console.log(element)
+        if (element.title == "unpacker") {
+          this.unpacker_json == element.children
+        }
+      })
+      console.log(this.unpacker_json)
       await axios
         .post("json-html", {
           item: this.response_json
