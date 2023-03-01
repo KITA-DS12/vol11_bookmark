@@ -79,7 +79,7 @@ model_name = "csebuetnlp/mT5_multilingual_XLSum"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
-async def make_title(test_bookmark_dct, session,tag = "description_and_keyword" ,max_num = 36):
+async def make_title(test_bookmark_dct, session : aiohttp.ClientSession ,tag = "description_and_keyword" ,max_num = 36):
   """_summary_
 
     Args:
@@ -115,14 +115,18 @@ async def make_title(test_bookmark_dct, session,tag = "description_and_keyword" 
 #async def make_title_lst(bookmark_dct_lst,tag = "description_and_keyword" ,max_num = 36 ):
 #  """_summary_
 #
-#    Args:
-#        test_bookmark_dct (dict_lst):idやurlなどの情報が入ったdictです。
-#        tag(string):スクレイピングの時に指定するtagです
+#    Args:sessionです
 #       max_num(int):生成するタイトルの最大文字数です
 #    """
 #  async with aiohttp.ClientSession() as session:
 #    result_list = await asyncio.gather(*[make_title(x, session, tag, max_num) for x in bookmark_dct_lst])
 #  return result_list
+
+async def run_title(bookmark: dict):
+  ans = []
+  async with aiohttp.ClientSession() as session:
+    ans = await make_title(bookmark, session)
+  return ans
 
   
 

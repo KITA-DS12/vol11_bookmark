@@ -11,6 +11,7 @@ import base64
 from typing import List
 from dictknife import deepmerge
 from api_convert import app as api_convert_router
+from api_title import app as api_title_router
 
 
 app = FastAPI()
@@ -23,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(api_convert_router)
+app.include_router(api_title_router)
 
 
 class Post(BaseModel):
