@@ -10,4 +10,5 @@ torch
 torchvision
 aiohttp
 Beautifulsoup4
+pyinstaller
 dictknife

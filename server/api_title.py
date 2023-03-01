@@ -6,7 +6,7 @@ from multiprocessing import Pool
 from logging import getLogger
 import time
 
-from title import run_title
+from .title import run_title
 
 logger = getLogger("uvicorn").getChild("ai")
 
