@@ -112,17 +112,17 @@ async def make_title(test_bookmark_dct, session,tag = "description_and_keyword" 
   return [id_txt_category_list[0], url_to_txt, summary]
 
 #一度にやる関数を作ったのですがエラーがでるので放置しています
-async def make_title_lst(bookmark_dct_lst,tag = "description_and_keyword" ,max_num = 36 ):
-  """_summary_
-
-    Args:
-        test_bookmark_dct (dict_lst):idやurlなどの情報が入ったdictです。
-        tag(string):スクレイピングの時に指定するtagです
-       max_num(int):生成するタイトルの最大文字数です
-    """
-  async with aiohttp.ClientSession() as session:
-    result_list = await asyncio.gather(*[make_title(x, session, tag, max_num) for x in bookmark_dct_lst])
-  return result_list
+#async def make_title_lst(bookmark_dct_lst,tag = "description_and_keyword" ,max_num = 36 ):
+#  """_summary_
+#
+#    Args:
+#        test_bookmark_dct (dict_lst):idやurlなどの情報が入ったdictです。
+#        tag(string):スクレイピングの時に指定するtagです
+#       max_num(int):生成するタイトルの最大文字数です
+#    """
+#  async with aiohttp.ClientSession() as session:
+#    result_list = await asyncio.gather(*[make_title(x, session, tag, max_num) for x in bookmark_dct_lst])
+#  return result_list
 
   
 
