@@ -16,5 +16,14 @@
                 "donjayamanne.python-extension-pack"
             ]
         }
-    }
+    },
+    "runArgs": [
+        // "--gpus", "all",
+        // "--shm-size", "64gb",
+        "--device", "/dev/video0:/dev/video0:mwr",
+        "--privileged",
+        "-e", "DISPLAY=:1",
+        "-e", "QT_X11_NO_MITSHM=1",
+        "-v", "/tmp/.X11-unix/:/tmp/.X11-unix:rw"
+      ]
 }
