@@ -3,4 +3,6 @@ apt update && apt install libgtkextra-dev libgconf2-dev libnss3 libasound2 libxt
 npm install electron --save-dev
 pip install -r ./server/requirements.txt
 npm install -g @vue/cli
-vue add electron-builder
+npm install -g n
+n 16
+
