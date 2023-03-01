@@ -1,4 +1,19 @@
-# vol11_bookmark
-分類分けではモデルをお借りしました。(https://huggingface.co/google/tapas-small-finetuned-wtq)  
+# client
 
-タイトルおすすめではモデルをお借りしました。(https://huggingface.co/csebuetnlp/mT5_multilingual_XLSum)
+## Project setup
+```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
