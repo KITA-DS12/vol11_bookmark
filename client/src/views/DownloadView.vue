@@ -105,6 +105,8 @@
                       <div class="textWrap" style="padding-top: 10px;"><a :href="selected.url">{{ selected.url }}</a>
                       </div>
                     </v-col>
+                    <v-col cols="12" sm="2">
+                    </v-col>
                   </v-row>
                   <div style="height: 60px" />
                   <v-row justify="center" style="text-align: center" align-content="center">
