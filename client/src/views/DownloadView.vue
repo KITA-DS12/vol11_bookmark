@@ -2,6 +2,33 @@
   <v-app id="inspire">
     <v-main class="red lighten-4">
       <v-card>
+        <v-dialog v-model="dialog" scrollable max-width="300px">
+          <v-card>
+            <v-card-title>Move a file</v-card-title>
+            <v-divider></v-divider>
+            <v-card-text style="height: 300px;">
+              <v-treeview :active.sync="active_dialog" :items="unpacker_json" item-key="id" item-text="title"
+                :load-children="fetchFiles" item-disabled activatable color="#CE5D84" transition :return-object="true"
+                expand-icon="">
+                <template v-slot:prepend="{ item }">
+                  <v-icon v-if="item.children">
+                    mdi-folder
+                  </v-icon>
+                </template>
+              </v-treeview>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="dialog = false">
+                Close
+              </v-btn>
+              <v-btn color="blue darken-1" text @click="moveFile">
+                Save
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
         <v-card-title class="teal lighten-1 white--text text-h5" style="padding-top: 3px;">
           <b>BookMark</b>
           <v-spacer />
@@ -25,6 +52,16 @@
                   mdi-folder
                 </v-icon>
               </template>
+              <template v-slot:append="{ item }">
+                <v-btn v-if="!item.children" fab small depressed color="grey lighten-5" @click="dialog = true">
+                  <v-icon>
+                    mdi-file-move-outline
+                  </v-icon>
+                </v-btn>
+                <v-icon v-if="item.children">
+                  mdi-pencil
+                </v-icon>
+              </template>
             </v-treeview>
           </v-col>
           <v-divider vertical></v-divider>
@@ -45,10 +82,19 @@
                   </v-avatar>
                   <v-row justify="center" style="text-align: center" align-content="center">
                     <v-col cols="12" sm="2">
-                      <v-subheader>title</v-subheader>
+                      <v-subheader style="margin-top: 12px;">title</v-subheader>
                     </v-col>
                     <v-col cols="12" sm="6">
                       <v-text-field v-model="selected.title" single-line width="30px"></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="2">
+                      <v-btn small rounded style="margin-top: 17px;" class="white--text" color="deep-purple lighten-2"
+                        @click="generateTitle(selected)">
+                        <v-icon>
+                          mdi-brain
+                        </v-icon>
+                        Generate
+                      </v-btn>
                     </v-col>
                   </v-row>
                   <v-row justify="center" style="text-align: center" align-content="center">
@@ -84,7 +130,7 @@
         </v-btn>
       </v-card>
     </v-main>
-    <v-progress-circular v-if="req_id != null" :size="70" :width="7" color="purple" indeterminate
+    <v-progress-circular v-if="req_id != null || gen_id != null" :size="70" :width="7" color="purple" indeterminate
       style="position: fixed; bottom: 50%; right: 45%;">
     </v-progress-circular>
   </v-app>
@@ -102,9 +148,13 @@ export default {
     response_children: null,
     unpacker_json: null,
     active: [],
+    active_dialog: [],
     open: [],
     files: [],
     req_id: null,
+    gen_id: null,
+    selectFolder: '',
+    dialog: false,
   }),
   computed: {
     selected() {
@@ -152,6 +202,20 @@ export default {
       let data = item.children.push(...this.response_children)
       return data
     },
+    moveFile() {
+      console.log(this.active[0])
+      console.log(this.active_dialog[0])
+      this.unpacker_json.forEach((folder) => {
+        console.log(folder)
+        folder.children.forEach((file, idx) => {
+          console.log(file, idx)
+          if (file.type == "url" && file.id == this.active[0].id) {
+            this.active_dialog[0].children.push(this.active[0])
+            folder.children.splice(idx, 1)
+          }
+        })
+      })
+    },
     async reloadFile() {
       await axios
         .post("json-json", {
@@ -184,6 +248,41 @@ export default {
         })
         .catch((err) => {
           console.log(err);
+        });
+    },
+    async generateTitle(selected_json) {
+      console.log(selected_json)
+      await axios
+        .post("title-post", {
+          bookmark: selected_json
+        })
+        .then((res) => {
+          console.log(res.data)
+          this.gen_id = res.data
+          this.waitForGenerating()
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    async waitForGenerating() {
+      console.log(this.gen_id)
+      await axios
+        .get(`title_get/${this.gen_id}`, {
+        })
+        .then((res) => {
+          console.log(res.data)
+          if (res.data.processing) {
+            setTimeout(this.waitForGenerating, 2000)
+          }
+          else {
+            this.active[0].title = res.data.summary
+            this.gen_id = null
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setTimeout(this.waitForGenerating, 2000)
         });
     },
     async downloadFile() {
