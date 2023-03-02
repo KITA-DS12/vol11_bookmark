@@ -3,7 +3,7 @@
 import asyncio 
 import aiohttp
 import re
-from .category import *
+from category import *
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 
