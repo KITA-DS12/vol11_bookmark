@@ -109,10 +109,9 @@
                   <div style="height: 60px" />
                   <v-row justify="center" style="text-align: center" align-content="center">
                     <v-card class="mx-auto" max-width="344" color="#FAFAFA" flat>
-                      <v-img id="previewImg" src="" height="200px" cover></v-img>
-                      <v-card-title id="previewTitle" />
-
-                      <v-card-subtitle id="previewDescription" />
+                      <v-img id="previewImg" :src="previewImg" height="200px" cover></v-img>
+                      <v-card-title id="previewTitle"> {{ previewTitle }} </v-card-title>
+                      <v-card-subtitle id="previewDescription"> {{ previewDescription }} </v-card-subtitle>
                     </v-card>
                   </v-row>
                   <div style="height: 60px" />
@@ -155,11 +154,17 @@ export default {
     gen_id: null,
     selectFolder: '',
     dialog: false,
+    previewTitle: "",
+    previewDescription: "",
+    previewImg: "",
   }),
   computed: {
     selected() {
       if (!this.active.length) return undefined
       if (this.active[0].type == "url") {
+        this.previewTitle  = ""
+        this.previewImg = ""
+        this.previewDescription = ""
         this.fetchPreview()
       }
       return this.active[0]
@@ -192,10 +197,9 @@ export default {
         .then(json => this.createIMG(json))
     },
     createIMG(json) {
-      console.log(json)
-      document.querySelector('#previewTitle').textContent = json.title;
-      document.querySelector('#previewImg').src = json.image;
-      document.querySelector('#previewDescription').textContent = json.description;
+      this.previewTitle = json.title;
+      this.previewImg = json.image;
+      this.previewDescription = json.description;
     },
     async fetchFiles(item) {
       await pause(1500)
