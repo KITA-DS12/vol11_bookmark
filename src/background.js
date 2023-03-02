@@ -4,7 +4,7 @@ import { app, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
-
+const {spawn} = require("child_process")
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
@@ -63,7 +63,28 @@ app.on('ready', async () => {
     }
   }
   createWindow()
-})
+
+//fastAPIを起動
+console.log("Start FastAPI")
+
+let proc = spawn(
+  "venv/bin/python",["src/server/main.py"]
+)
+proc.stdout.on("data",(data) =>{
+  console.log(data.toString());
+});
+proc.stderr.on("data", (data) => {
+  console.log(data.toString());
+});
+proc.on("close", (code) => {
+  console.log(code);
+});
+  }
+);
+
+
+
+
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
