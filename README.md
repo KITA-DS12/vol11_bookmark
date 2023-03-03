@@ -12,3 +12,8 @@ python3 -m pip install -r src/server/requirements.txt
 
 ```
 1. run node_modules/dist_electron/client-0.1.0.AppImage
+
+# モデルわけ
+分類分けではモデルをお借りしました。(https://huggingface.co/google/tapas-small-finetuned-wtq)  
+
+タイトルおすすめではモデルをお借りしました。(https://huggingface.co/csebuetnlp/mT5_multilingual_XLSum)
