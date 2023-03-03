@@ -114,9 +114,6 @@
                 Select a File
               </div>
               <v-card v-else style="width: 50vw" class="pt-6 mx-auto class red lighten-5" flat>
-                <div v-if="selected.type == 'folder'">
-                  folder
-                </div>
                 <div v-if="selected.type == 'url'">
                   <v-avatar size="64">
                     <img :src="selected.icon">
