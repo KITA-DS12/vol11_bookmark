@@ -37,7 +37,7 @@ def sort_by_ai(bookmark_file : JsonPost, target_folder : list) -> dict:
     try:
         loop = asyncio.get_event_loop()
     except Exception:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
     book_mark_info_list = bookmark_json.folder_to_list(folder_name=target_folder)
     categorize_list = loop.run_until_complete(mf(
         book_mark_info_list=book_mark_info_list,
