@@ -34,7 +34,7 @@ def sort_by_ai(bookmark_file : JsonPost, target_folder : list) -> dict:
     target_folder = set(target_folder)
     logging.info("Start Sort")
     bookmark_json = BookMark_Json(bookmark_file.bookmark)
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
     book_mark_info_list = bookmark_json.folder_to_list(folder_name=target_folder)
     categorize_list = loop.run_until_complete(mf(
         book_mark_info_list=book_mark_info_list,
@@ -49,11 +49,6 @@ def sort_by_ai(bookmark_file : JsonPost, target_folder : list) -> dict:
     logging.info("End Sort")
     return bookmark
 
-def wrap_sort(sort):
-    """sort_by_aiのwrap関数"""
-    result = sort_by_ai(*sort)
-    return result
-
 
     
 
@@ -65,12 +60,12 @@ def ai_processing(bookmark_file : JsonPost,id : str) -> None:
     jobs[id] = JsonReturn(bookmark={}, processing=True)
     args = [(bookmark_file, bookmark_file.target)]
     p = Pool(1)
-    bookmark = p.map(wrap_sort, args)
+    bookmark = sort_by_ai(bookmark_file,bookmark_file.target)
 
 
     logging.info("Ended AI Process id:{}".format(id))
 
-    jobs[id] = JsonReturn(bookmark=bookmark[0], processing=False)
+    jobs[id] = JsonReturn(bookmark=bookmark, processing=False)
 
 
 
