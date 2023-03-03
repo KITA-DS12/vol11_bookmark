@@ -49,7 +49,7 @@ def title_processing(bookmark : TitlePost, id : str) -> None:
     bookmark_return = p.map(suggestion_by_ai, bookmark)
     logger.info("Ended AI Process id:{}".format(id))
 
-    jobs[id] = bookmark_return
+    jobs[id] = bookmark_return[0]
 
 @app.post(
     "/title-post",
@@ -90,10 +90,10 @@ async def result(id : str) -> TitleReturn:
     if task == None:
         raise HTTPException(404, detail="Job is not found.")
 
-    if task[0].processing == False:
+    if task.processing == False:
         jobs.pop(id)
 
-    return task[0]
+    return task
 
 
 
