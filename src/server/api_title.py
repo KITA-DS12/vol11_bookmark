@@ -1,116 +1,95 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
 from typing import List,Optional,Dict
-from category import make_folder_category_list as mf
-from utils import BookMark_Json
 import asyncio
-from logging import getLogger
 from multiprocessing import Pool
+from logging import getLogger
 import time
 
+from title import run_title
+
+logger = getLogger("uvicorn").getChild("ai")
 
 app = APIRouter()
 
-logging = getLogger("uvicorn").getChild("ai")
+class TitlePost(BaseModel):
+    """Title変換のUploadの形式"""
+    bookmark: dict = Field(
+        {},description="BookmarkのDict"
+    )
 
-
-
-class JsonPost(BaseModel):
-    bookmark: dict = Field({}, description="BookmarkのDict")
-    folder: List[str] = Field(["Folder"], description="フォルダー")
-    other: Optional[str] = Field("その他", description="その他のフォルダーの名前")
-    target : Optional[List[str]] = Field([""], description="対象のフォルダー(Defalt = root)")
-
-class JsonReturn(BaseModel):
-    bookmark: Optional[dict] = Field({}, description="BookmarkのDict")
-    processing : bool = Field(True, description="サーバーにて処理中かどうか")
+class TitleReturn(BaseModel):
+    """Title変換のReturnの形式"""
+    processing : bool
+    id : Optional[int] = Field(0, description="ID")
+    url_to_list : Optional[str] = Field("Title", description="スクレイピングの結果")
+    summary : Optional[str] = Field("まとめ", description="タイトル")
 
 class Not_Found(BaseModel):
     detail : str = Field("Not Found", description="Message")
 
-jobs : Dict[str, JsonReturn] = {}
-def sort_by_ai(bookmark_file : JsonPost, target_folder : list) -> dict:
-    """AIにSORTしてもらう"""
-    target_folder = set(target_folder)
-    logging.info("Start Sort")
-    bookmark_json = BookMark_Json(bookmark_file.bookmark)
+jobs : Dict[str, TitleReturn] = {}
+
+def suggestion_by_ai(title) -> TitleReturn:
+    """AIにtitleをおすすめしてもらう"""
+    logger.info("Start generate title")
     try:
         loop = asyncio.get_event_loop()
     except Exception:
         loop = asyncio.new_event_loop()
-    book_mark_info_list = bookmark_json.folder_to_list(folder_name=target_folder)
-    categorize_list = loop.run_until_complete(mf(
-        book_mark_info_list=book_mark_info_list,
-        candidate_labels_list=bookmark_file.folder,
-        other_folder_name=bookmark_file.other
-
-    ))
-    bookmark = bookmark_json.list_to_folder(
-        categorise=categorize_list,
-        target_folder=target_folder
+    result = loop.run_until_complete(
+        run_title(title)
     )
-    logging.info("End Sort")
-    return bookmark
+    ans = TitleReturn(processing = False,id = result[0], url_to_list = result[1], summary = result[2])
+    return ans
 
 
-    
-
-def ai_processing(bookmark_file : JsonPost,id : str) -> None:
-    """AIに分類してもらう"""
-    logging.info("Start AI Process id:{}".format(id))
-    bookmark = []
-
-    jobs[id] = JsonReturn(bookmark={}, processing=True)
-    args = [(bookmark_file, bookmark_file.target)]
+def title_processing(bookmark : TitlePost, id : str) -> None:
+    """AIにタイトルを出してもらう"""
+    logger.info("Start Title Process id:{}".format(id))
+    jobs[id] = TitleReturn(processing=True)
     p = Pool(1)
-    bookmark = sort_by_ai(bookmark_file,bookmark_file.target)
+    bookmark_return = suggestion_by_ai(bookmark)
+    logger.info("Ended AI Process id:{}".format(id))
 
-
-    logging.info("Ended AI Process id:{}".format(id))
-
-    jobs[id] = JsonReturn(bookmark=bookmark, processing=False)
-
-
-
+    jobs[id] = bookmark_return
 
 @app.post(
-    "/json-json",
-    status_code=202   
+    "/title-post",
+    status_code=202
 )
-async def json_to_json(background : BackgroundTasks,bookmark_file: JsonPost) -> str:
-    """JSONのAIを使用して処理するリクエストを発行する
+async def title_post(background : BackgroundTasks,
+                     bookmark : TitlePost) -> str:
+    """Titleのおすすめを返す
 
     Args:
-        file (JsonPost): Schemeを参照
-
+        bookmark (TitlePost): Schemeを参照
     Returns:
-        string: Request ID
-    """
+        string : Request ID
+    """    
     job_id = str(time.time()).replace(".","-")
     background.add_task(
-        ai_processing,
-        bookmark_file,
+        title_processing,
+        bookmark,      
         job_id
     )
-    jobs[job_id] = JsonReturn(bookmark = None, processing=True)
 
     return job_id
 
-    
 @app.get(
-    "/json-json/{id}",
+    "/title_get/{id}",
     responses = {404: {"model" : Not_Found}}
 )
-async def result(id : str) -> JsonReturn:
+async def result(id : str) -> TitleReturn:
     """現在のJOBのステータスを返す
 
     Args:
         id (str): Request ID
 
     Returns:
-        JsonReturn: Schemeを参照
+        TitleReturn: Schemeを参照
     """
-    task : JsonReturn = jobs.get(id)
+    task : TitleReturn = jobs.get(id)
     if task == None:
         raise HTTPException(404, detail="Job is not found.")
 
@@ -118,9 +97,7 @@ async def result(id : str) -> JsonReturn:
         jobs.pop(id)
 
     return task
-        
 
-    
 
 
     
