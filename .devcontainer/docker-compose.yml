@@ -8,3 +8,5 @@ services:
     container_name: "server"
     volumes:
       - .:/workspace:cached
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

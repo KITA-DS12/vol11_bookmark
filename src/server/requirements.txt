@@ -11,4 +11,6 @@ torchvision
 aiohttp
 Beautifulsoup4
 pyinstaller
+cx_Freeze
+libtorch
 dictknife

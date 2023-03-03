@@ -1,19 +1,12 @@
-# client
+# unpacker
 
-## Project setup
-```
-npm install
-```
+## install (Linux x86)
+1. download file from release.
+1. unzip
+1. run this command
+```bash
+python3 -m venv /tmp/venv
+/tmp/venv/bin/python -m pip install -r src/server/requirements.txt
 
-### Compiles and hot-reloads for development
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+1. run node_modules/dist_electron/client-0.1.0.AppImage

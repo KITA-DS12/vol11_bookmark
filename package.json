@@ -27,7 +27,7 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
-    "electron": "^11.0.0",
+    "electron": "^11.5.0",
     "electron-devtools-installer": "^3.1.0",
     "sass": "~1.32.0",
     "sass-loader": "^10.0.0",
@@ -41,7 +41,7 @@
     "last 2 versions",
     "not dead"
   ],
-  "browser":{
+  "browser": {
     "child_process": false
   }
 }

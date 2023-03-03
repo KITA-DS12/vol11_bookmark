@@ -5,6 +5,7 @@ import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 const {spawn} = require("child_process")
+const {exec} = require("child_process")
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
@@ -13,7 +14,7 @@ protocol.registerSchemesAsPrivileged([
 console.log("Start FastAPI")
 
 let proc = spawn(
-  "venv/bin/python3",['src/server/main.py']
+  "/tmp/venv/bin/python3",["src/server/main.py"]
 )
 proc.stdout.on("data",(data) =>{
   console.log(data.toString());
@@ -56,6 +57,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+app.on('will-quit', (event) => {
+  // スクリプトを実行したり、終了処理を行ったりします
+  console.log('Quit FastAPI')
   proc.kill("SIGINT")
 })
 
