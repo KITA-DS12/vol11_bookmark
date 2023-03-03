@@ -15,12 +15,8 @@ module.exports = defineConfig({
           "from": "src/server",
           "to": "src/server",
           "filter":["**/*"]
-        },
-          {
-          "from": "venv",
-          "to": "venv",
-          "filter":["**/*"]
         }
+
       ]
 
       }

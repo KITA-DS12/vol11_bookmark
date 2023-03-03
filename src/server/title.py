@@ -2,8 +2,8 @@
 #################################### ライブラリ ####################################
 import asyncio 
 import aiohttp
+import category
 import re
-from category import *
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 
@@ -91,7 +91,7 @@ async def make_title(test_bookmark_dct, session : aiohttp.ClientSession ,tag = "
   if len(id_txt_category_list) == 0:
     return []
   else:
-    url_to_txt = await scraping_meta(id_txt_category_list[1], tag, session)
+    url_to_txt = await category.scraping_meta(id_txt_category_list[1], tag, session)
     input_ids = tokenizer(
       [WHITESPACE_HANDLER(url_to_txt)],
       return_tensors="pt",
@@ -125,7 +125,7 @@ async def make_title(test_bookmark_dct, session : aiohttp.ClientSession ,tag = "
 async def run_title(bookmark: dict):
   ans = []
   async with aiohttp.ClientSession() as session:
-    ans = await make_title(bookmark, session)
+    ans = await make_title(bookmark.bookmark, session)
   return ans
 
   
