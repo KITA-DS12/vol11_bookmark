@@ -1,14 +1,12 @@
 {	"name": "Python 3",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/python:0-3.8-bullseye",
-    "workspaceFolder": "/workspaces/vol11_bookmark/server",
+    "workspaceFolder": "/workspaces/vol11_bookmark/",
 
     "features": {
                   "ghcr.io/devcontainers/features/git:1": {},
                   "ghcr.io/guiyomh/features/vim:0": {},
-                  "ghcr.io/devcontainers/features/docker-from-docker": {},
-                  "ghcr.io/oleksis/devcontainer-features/python-launcher": {},
-                  "ghcr.io/devcontainers/features/python": {}
+                  "ghcr.io/devcontainers/features/docker-from-docker": {}
           },
     "customizations": {
         "vscode": {
@@ -16,5 +14,15 @@
                 "donjayamanne.python-extension-pack"
             ]
         }
-    }
+    },
+    "mounts": [
+        "source=/tmp/.X11-unix/,target=/tmp/.X11-unix/,type=bind,consistency=cached"
+    ],
+    "runArgs": [
+        // "--gpus", "all",
+        // "--shm-size", "64gb",
+        "--privileged",
+        "-e", "DISPLAY=:0",
+        "--add-host", "host.docker.internal:host-gateway"
+      ]
 }

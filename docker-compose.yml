@@ -8,7 +8,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./client:/client
+      - .:/client
 
 
   server:
@@ -19,4 +19,4 @@ services:
     ports:
       - 8888:8888
     volumes:
-      - ./server:/server
+      - ./src/server:/server
