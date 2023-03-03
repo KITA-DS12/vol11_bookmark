@@ -125,7 +125,7 @@ async def make_title(test_bookmark_dct, session : aiohttp.ClientSession ,tag = "
 async def run_title(bookmark: dict):
   ans = []
   async with aiohttp.ClientSession() as session:
-    ans = await make_title(bookmark, session)
+    ans = await make_title(bookmark.bookmark, session)
   return ans
 
   

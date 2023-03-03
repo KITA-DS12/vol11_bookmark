@@ -33,9 +33,12 @@ jobs : Dict[str, TitleReturn] = {}
 def suggestion_by_ai(title) -> TitleReturn:
     """AIにtitleをおすすめしてもらう"""
     logger.info("Start generate title")
-    loop = asyncio.get_event_loop()
+    try:
+        loop = asyncio.get_event_loop()
+    except Exception:
+        loop = asyncio.new_event_loop()
     result = loop.run_until_complete(
-        run_title(title[1])
+        run_title(title)
     )
     ans = TitleReturn(processing = False,id = result[0], url_to_list = result[1], summary = result[2])
     return ans
@@ -46,7 +49,7 @@ def title_processing(bookmark : TitlePost, id : str) -> None:
     logger.info("Start Title Process id:{}".format(id))
     jobs[id] = TitleReturn(processing=True)
     p = Pool(1)
-    bookmark_return = p.map(suggestion_by_ai, bookmark)
+    bookmark_return = suggestion_by_ai(bookmark)
     logger.info("Ended AI Process id:{}".format(id))
 
     jobs[id] = bookmark_return
@@ -90,10 +93,10 @@ async def result(id : str) -> TitleReturn:
     if task == None:
         raise HTTPException(404, detail="Job is not found.")
 
-    if task[0].processing == False:
+    if task.processing == False:
         jobs.pop(id)
 
-    return task[0]
+    return task
 
 
 
