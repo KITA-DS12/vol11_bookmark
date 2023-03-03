@@ -4,7 +4,7 @@
       <v-card>
         <v-dialog v-model="dialogExec">
           <v-card>
-            <v-card-title>Move a file</v-card-title>
+            <v-card-title>Select target folder</v-card-title>
             <v-divider></v-divider>
             <v-card-text>
               <div style="height: 10vh" />
