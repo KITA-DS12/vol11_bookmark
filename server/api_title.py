@@ -36,7 +36,7 @@ def suggestion_by_ai(title) -> TitleReturn:
     try:
         loop = asyncio.get_event_loop()
     except Exception:
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
     result = loop.run_until_complete(
         run_title(title)
     )
