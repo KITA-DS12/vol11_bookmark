@@ -2,7 +2,48 @@
   <v-app id="inspire">
     <v-main class="red lighten-4">
       <v-card>
-        <v-dialog v-model="dialog" scrollable max-width="300px">
+        <v-dialog v-model="dialogExec">
+          <v-card>
+            <v-card-title>Move a file</v-card-title>
+            <v-divider></v-divider>
+            <v-card-text>
+              <div style="height: 10vh" />
+              <v-combobox v-model="targets" :items="folders" hide-selected multiple
+                label="Select the target folder for classification." @input="onInputCombobox">
+                <template v-slot:selection="{ attrs, item, parent, selected }">
+                  <v-chip v-bind="attrs" color="pink lighten-2" text-color="white" :input-value="selected" label>
+                    <span class="pr-2">
+                      {{ item }}
+                    </span>
+                    <v-icon small @click="parent.selectItem(item)">
+                      $delete
+                    </v-icon>
+                  </v-chip>
+                </template>
+              </v-combobox>
+              <v-combobox v-model="chips" clearabkle hide-selected label="Please enter a name for the folder." multiple
+                height="300">
+                <template v-slot:selection="{ attrs, item, select, selected }">
+                  <v-chip class="white--text" color="deep-purple lighten-2" v-bind="attrs" :input-value="selected" close
+                    @click="select" @click:close="removeChips(item)" label>
+                    <strong>{{ item }}</strong>&nbsp;
+                  </v-chip>
+                </template>
+              </v-combobox>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="dialogExec = false">
+                Close
+              </v-btn>
+              <v-btn color="blue darken-1" text @click="reloadFile">
+                EXEC
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialogMove" scrollable max-width="300px">
           <v-card>
             <v-card-title>Move a file</v-card-title>
             <v-divider></v-divider>
@@ -20,7 +61,7 @@
             <v-divider></v-divider>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="dialog = false">
+              <v-btn color="blue darken-1" text @click="dialogMove = false">
                 Close
               </v-btn>
               <v-btn color="blue darken-1" text @click="moveFile">
@@ -32,7 +73,7 @@
         <v-card-title class="teal lighten-1 white--text text-h5" style="padding-top: 3px;">
           <b>BookMark</b>
           <v-spacer />
-          <v-btn rounded class="black--text" color="grey lighten-3" x-large @click="reloadFile">
+          <v-btn rounded class="black--text" color="grey lighten-3" x-large @click="dialogExec = true">
             EXECUTE
             <v-icon dark right>
               mdi-reload
@@ -53,7 +94,7 @@
                 </v-icon>
               </template>
               <template v-slot:append="{ item }">
-                <v-btn v-if="!item.children" fab small depressed color="grey lighten-5" @click="dialog = true">
+                <v-btn v-if="!item.children" fab small depressed color="grey lighten-5" @click="dialogMove = true">
                   <v-icon>
                     mdi-file-move-outline
                   </v-icon>
@@ -155,7 +196,10 @@ export default {
     req_id: null,
     gen_id: null,
     selectFolder: '',
-    dialog: false,
+    dialogMove: false,
+    dialogExec: false,
+    folders: [],
+    targets: [],
     previewTitle: "",
     previewDescription: "",
     previewImg: "",
@@ -164,7 +208,7 @@ export default {
     selected() {
       if (!this.active.length) return undefined
       if (this.active[0].type == "url") {
-        this.previewTitle  = ""
+        this.previewTitle = ""
         this.previewImg = ""
         this.previewDescription = ""
         this.fetchPreview()
@@ -184,8 +228,34 @@ export default {
         console.log("else")
       }
     })
+    this.unpacker_json.forEach((folder) => {
+      console.log(folder)
+      if (folder.type == "folder" && folder.children.length != 0) {
+        console.log(folder.title)
+        this.folders.push(folder.title)
+      }
+    })
+    this.targets = this.folders
   },
   methods: {
+    onInputCombobox() {
+      this.$nextTick(() => {
+        // 入力値が選択肢にあるかチェックします。
+        let isExist = false;
+        for (let folder of this.folders) {
+          if (this.targets[this.targets.length - 1] == folder) {
+            isExist = true;
+            break;
+          }
+        }
+
+        // 入力値が選択肢にない場合
+        if (!isExist) {
+          // 入力値をクリアします。
+          this.targets.pop()
+        }
+      })
+    },
     async fetchPreview() {
       await fetch('https://api.linkpreview.net', {
         method: 'POST',
@@ -223,12 +293,13 @@ export default {
       })
     },
     async reloadFile() {
+      this.dialogExec = false
       await axios
         .post("json-json", {
           bookmark: this.response_json,
           folder: this.chips,
           other: "その他",
-          target: this.chips,
+          target: this.targets,
         })
         .then((res) => {
           this.req_id = res.data
@@ -249,6 +320,21 @@ export default {
           else {
             this.response_json = res.data.bookmark
             this.response_children = this.response_json.children
+            this.response_children.forEach(element => {
+              if (element.title == "unpacker") {
+                this.unpacker_json = element.children
+              }
+            })
+            this.folders = []
+            this.targets = []
+            this.unpacker_json.forEach((folder) => {
+              console.log(folder)
+              if (folder.type == "folder" && folder.children.length != 0) {
+                console.log(folder.title)
+                this.folders.push(folder.title)
+              }
+            })
+            this.targets = this.folders
             this.req_id = null
           }
         })
@@ -319,6 +405,9 @@ export default {
       link.download = "bookmark.html";
       link.click();
     },
+    removeChips(item) {
+      this.chips.splice(this.chips.indexOf(item), 1)
+    }
   }
 }
 </script>
