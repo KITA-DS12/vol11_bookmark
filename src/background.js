@@ -9,7 +9,21 @@ const {spawn} = require("child_process")
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
+//fastAPIを起動
+console.log("Start FastAPI")
 
+let proc = spawn(
+  "venv/bin/python3",['src/server/main.py']
+)
+proc.stdout.on("data",(data) =>{
+  console.log(data.toString());
+});
+proc.stderr.on("data", (data) => {
+  console.log(data.toString());
+});
+proc.on("close", (code) => {
+  console.log(code);
+});
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -42,6 +56,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+  proc.kill("SIGINT")
 })
 
 app.on('activate', () => {
@@ -64,21 +79,7 @@ app.on('ready', async () => {
   }
   createWindow()
 
-//fastAPIを起動
-console.log("Start FastAPI")
 
-let proc = spawn(
-  "venv/bin/python",["src/server/main.py"]
-)
-proc.stdout.on("data",(data) =>{
-  console.log(data.toString());
-});
-proc.stderr.on("data", (data) => {
-  console.log(data.toString());
-});
-proc.on("close", (code) => {
-  console.log(code);
-});
   }
 );
 
