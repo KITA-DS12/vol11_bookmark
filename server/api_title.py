@@ -33,7 +33,10 @@ jobs : Dict[str, TitleReturn] = {}
 def suggestion_by_ai(title) -> TitleReturn:
     """AIにtitleをおすすめしてもらう"""
     logger.info("Start generate title")
-    loop = asyncio.new_event_loop()
+    try:
+        loop = asyncio.get_event_loop()
+    except Exception:
+        loop = asyncio.get_event_loop()
     result = loop.run_until_complete(
         run_title(title)
     )
