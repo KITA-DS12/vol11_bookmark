@@ -13,18 +13,18 @@ protocol.registerSchemesAsPrivileged([
 //fastAPIを起動
 console.log("Start FastAPI")
 
-let proc = spawn(
-  "/tmp/venv/bin/python3",["src/server/main.py"]
-)
-proc.stdout.on("data",(data) =>{
-  console.log(data.toString());
-});
-proc.stderr.on("data", (data) => {
-  console.log(data.toString());
-});
-proc.on("close", (code) => {
-  console.log(code);
-});
+//let proc = spawn(
+//  "/tmp/venv/bin/python3",["src/server/main.py"]
+//)
+//proc.stdout.on("data",(data) =>{
+//  console.log(data.toString());
+//});
+//proc.stderr.on("data", (data) => {
+//  console.log(data.toString());
+//});
+//proc.on("close", (code) => {
+//  console.log(code);
+//});
 async function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
