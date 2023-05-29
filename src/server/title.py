@@ -4,6 +4,7 @@ import asyncio
 import aiohttp
 import category
 import re
+import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 
@@ -78,6 +79,9 @@ WHITESPACE_HANDLER = lambda k: re.sub('\s+', ' ', re.sub('\n+', ' ', k.strip()))
 model_name = "csebuetnlp/mT5_multilingual_XLSum"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+model = model.to(device)
+
 
 async def make_title(test_bookmark_dct, session : aiohttp.ClientSession ,tag = "description_and_keyword" ,max_num = 36):
   """_summary_
@@ -97,7 +101,7 @@ async def make_title(test_bookmark_dct, session : aiohttp.ClientSession ,tag = "
       return_tensors="pt",
       padding="max_length",
       truncation=True,
-      max_length=512)["input_ids"]
+      max_length=512).to(device)["input_ids"]
     output_ids = model.generate(
       input_ids=input_ids,
       max_length=max_num,

@@ -4,8 +4,11 @@ from bs4 import BeautifulSoup
 from transformers import pipeline
 import asyncio 
 import aiohttp
+import torch
+device = 0 if torch.cuda.is_available() else -1
 classifier = pipeline("zero-shot-classification",
-                      model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli")
+                      model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli", device=device)
+print("Device:",device)
 
 #################################### 入力 ####################################
 # クラスタリングしたいフォルダの種類一覧
