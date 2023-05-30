@@ -1,34 +1,96 @@
-![unpacker](./src/assets/logo.png)
+
+# Unpakcer
+
 Categorize browser bookmarks and Suggest site title.
 
-## Support Browser
-- Google Chrome
-- Microsoft Edge
-- Opera
+[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 
-Oher Chromium based Browser
+![Logo](https://github.com/KITA-DS12/vol11_bookmark/raw/main/src/assets/logo.png)
 
-## Run (Linux x86)(electron)
-1. download Pakage from release page.
-1. unzip
-1. run this command
+## Demo
+
+TODO
+
+## Features
+
+- Categorize Bookmarks
+- Generate titltes automatically by summary of text
+- Importing multiple browser Bookmarks
+- Editing Bookmarks
+- Site Preview
+- Support Chromium based browser and Firefox
+
+## Run Locally
+
+### Dependencies
+
+- Docker
+- Docker-Compose
+- At least 16 GB memory
+
+### Recommends
+
+- Nvidia Container Toolkit
+- npm
+- GPU with CUDA support
+- 32GB memory
+
+### Run on Docker (Recommend)
+
+Clone the project
+
 ```bash
-$ python3 -m venv /tmp/venv
-$ source /tmp/venv/bin/activate
-$ python3 -m pip install -r src/server/requirements.txt
-$ /tmp/venv/bin/python ./src/server/main.py
+  git clone https://github.com/KITA-DS12/vol11_bookmark
 ```
-1. run `node_modules/dist_electron/client-0.1.0.AppImage`
 
-## Run in Docker
-1. Clone this repository.
-1. Run command.
-``` bash
-$ docker-compose up -d
+Go to the project directory
+
+```bash
+  cd vol11_bookmark
 ```
-1. Aceess `localhost:8080` on your browser.
+
+Run Docker
+
+```bash
+  docker-compose up 
+```
+
+You can now access unpacker on localhost:8080
+
+### Run on Electron (Experimental)
+
+Clone the project
+
+```bash
+  git clone https://github.com/KITA-DS12/vol11_bookmark
+```
+
+Go to the project directory
+
+```bash
+  cd vol11_bookmark
+```
+
+Run Server
+
+```bash
+  docker-compose up server -d
+```
+
+Install Dependencies
+
+```bash
+  npm install
+```
+
+Run Electron
+
+```bash
+  yarn run electron:serve
+```
 
 ## Usage
+
 1. Export your bookmark html file from your browser.
 1. Upload Bookmark File.
 1. Choose Target Folder.
@@ -37,14 +99,33 @@ $ docker-compose up -d
 1. Download Categorized Bookmark HTML file.
 1. Import HTML file to your browser.
 
-## About Model
-分類分けではモデルをお借りしました。(https://huggingface.co/google/tapas-small-finetuned-wtq)  
+## FAQ
 
-タイトルおすすめではモデルをお借りしました。(https://huggingface.co/csebuetnlp/mT5_multilingual_XLSum)
+#### vue-cli-service not found when starting server
+
+Run follow command in local.
+
+```bash
+npm install @vue/cli
+```
+
+## Tech Stack
+
+**Client:** Vue.js, Vuetify
+
+**Server:** FastAPI, Pytorch, Hugging Face
+
+## Acknowledgements
+
+- [README Editor](https://readme.so/ja/editor)
+- [Geek Project](https://biz.supporterz.jp/geekpjt/)
+- [Geek Camp](https://talent.supporterz.jp/geekcamp/)
+
+We used the following Model
+
+- [Categorize Model](https://huggingface.co/google/tapas-small-finetuned-wtq)
+- [Generate Title Model](https://huggingface.co/csebuetnlp/mT5_multilingual_XLSum)
 
 ## License
 
-See 
-[License][def]
-
-[def]: ./LICENSE
+[GNU General Public License v3.0](https://github.com/KITA-DS12/vol11_bookmark/blob/main/LICENSE)
