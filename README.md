@@ -9,7 +9,9 @@ Categorize browser bookmarks and Suggest site title.
 
 ## Demo
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/GBR4Z58Ww-8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+Please click on the thumbnails
+
+[![Demo Movie](http://img.youtube.com/vi/GBR4Z58Ww-8/sddefault.jpg)](https://www.youtube.com/watch?v=GBR4Z58Ww-8)
 
 ## Features
 
