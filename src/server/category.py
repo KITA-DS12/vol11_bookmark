@@ -123,14 +123,14 @@ def update_foldername(id_foldername, candidate_labels_list, other_folder_name, c
     return output
 
 #スクレイピング
-async def scraping_meta(url, tag, session):
+async def scraping_meta(url, tag, session : aiohttp.client.ClientSession):
 
     try:
         async with session.get(url) as response:
             r = await response.text()
             soup = BeautifulSoup(r, "html.parser")
     except Exception:
-        return None
+        return ""
 
     descriptions = []
     for a in soup.select('meta[name="description"]'):
