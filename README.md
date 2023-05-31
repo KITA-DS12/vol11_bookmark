@@ -73,6 +73,12 @@ Go to the project directory
   cd vol11_bookmark
 ```
 
+Obtain [linkpreview's](https://www.linkpreview.net/) API Key
+
+```bash
+  echo VUE_APP_API_KEY={YOUR API KEY} > .env.local
+```
+
 Run Server
 
 ```bash
