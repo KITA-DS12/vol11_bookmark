@@ -10,6 +10,9 @@ services:
     volumes:
       - .:/client
 
+    env_file:
+      - .env.local
+
 
   server:
     container_name: "server"
