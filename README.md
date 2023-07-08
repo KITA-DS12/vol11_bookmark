@@ -140,6 +140,14 @@ We used the following Model
 - [Categorize Model](https://huggingface.co/google/tapas-small-finetuned-wtq)
 - [Generate Title Model](https://huggingface.co/csebuetnlp/mT5_multilingual_XLSum)
 
+
+## Citation
+
+- Laurer, Moritz, Wouter van Atteveldt, Andreu Salleras Casas, and Kasper Welbers. 2022. ‘Less Annotating, More Classifying – Addressing the Data Scarcity Issue of Supervised Machine Learning with Deep Transfer Learning and BERT - NLI’. Preprint, June. Open Science Framework. https://osf.io/74b8k.
+
+- Hasan, T., Bhattacharjee, A., Islam, M., Mubasshir, K., Li, Y.F., Kang, Y.B., Rahman, M., & Shahriyar, R. (2021). XL-Sum: Large-Scale Multilingual Abstractive Summarization for 44 Languages. In Findings of the Association for Computational Linguistics: ACL-ĲCNLP 2021 (pp. 4693–4703). Association for Computational Linguistics.https://aclanthology.org/2021.findings-acl.413
+
+
 ## License
 
 [GNU General Public License v3.0](https://github.com/KITA-DS12/vol11_bookmark/blob/main/LICENSE)
