@@ -127,7 +127,7 @@ npm install @vue/cli
 
 **Client:** Vue.js, Vuetify
 
-**Server:** FastAPI, Pytorch, Hugging Face
+**Server:** FastAPI, Pytorch, Transformer
 
 ## Acknowledgements
 
