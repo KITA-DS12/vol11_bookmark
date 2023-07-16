@@ -137,7 +137,7 @@ npm install @vue/cli
 
 We used the following Model
 
-- [Categorize Model](https://huggingface.co/google/tapas-small-finetuned-wtq)
+- [Categorize Model](https://huggingface.co/MoritzLaurer/mDeBERTa-v3-base-mnli-xnli)
 - [Generate Title Model](https://huggingface.co/csebuetnlp/mT5_multilingual_XLSum)
 
 
