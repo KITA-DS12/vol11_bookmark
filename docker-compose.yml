@@ -14,8 +14,9 @@ services:
       - .env.local
 
 
-  server:
-    container_name: "server"
+  server-with-gpu:
+    container_name: "server-with-gpu"
+    profiles: ["gpu"]
     build:
       context: .
       dockerfile: ./docker/server/Dockerfile
@@ -30,3 +31,13 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+  server-without-gpu:
+    container_name: "server-without-gpu"
+    profiles: ["cpu"]
+    build:
+      context: .
+      dockerfile: ./docker/server/Dockerfile
+    ports:
+      - 8888:8888
+    volumes:
+      - ./src/server:/server

@@ -59,8 +59,16 @@ Obtain [linkpreview's](https://www.linkpreview.net/) API Key
 
 Run Docker
 
+If you have Nvidia GPU.
+
 ```bash
-  docker-compose up 
+  docker-compose --profile gpu up 
+```
+
+If you want to run unpacker without GPU.
+Unpacker runs only CPU.
+```bash
+  docker-compose --profile cpu up
 ```
 
 You can now access unpacker on localhost:8080
